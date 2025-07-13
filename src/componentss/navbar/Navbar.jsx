@@ -51,7 +51,7 @@ const Navbar = () => {
                     <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-white text-sm font-medium">
                         <li><Link to="/">Home</Link></li>
                         <li><Link to="/allproduct">All Product</Link></li>
-                        {!user && <li><Link to="/login">Login</Link></li>}
+                        {/* {!user && <li><Link to="/login">Login</Link></li>} */}
                         {user?.role === "user" && <li><Link to="/user-dashboard">User</Link></li>}
                         {user?.role === "admin" && <li><Link to="/admin-dashboard">Admin</Link></li>}
                         {user && <li className="cursor-pointer" onClick={logout}>Logout</li>}
