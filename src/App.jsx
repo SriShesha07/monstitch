@@ -2,7 +2,7 @@ import { Button } from "@material-tailwind/react";
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
-import NoPage from "./pages/nopage/NoPage";
+// import NoPage from "./pages/nopage/NoPage";
 import ProductInfo from "./pages/productInfo/ProductInfo";
 import ScrollTop from "./componentss/scrollTop/ScrollTop";
 import CartPage from "./pages/cart/CartPage";
@@ -27,7 +27,7 @@ export default function App() {
         <ScrollTop />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/*" element={<NoPage />} />
+          {/* <Route path="/*" element={<NoPage />} /> */}
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/allproduct" element={<AllProduct />} />

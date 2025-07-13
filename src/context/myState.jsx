@@ -31,7 +31,7 @@ function MyState({ children }) {
                 setGetAllProduct(productArray);
                 setLoading(false);
             });
-            console.log(data);
+          
             return () => data;
         } catch (error) {
             console.log(error);
