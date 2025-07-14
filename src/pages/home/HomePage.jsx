@@ -15,7 +15,7 @@ export default function HomePage() {
       {/* <Category /> */}
       <HomePageProductCard />
       <Track />
-      <Testimonial /> 
+      {/* <Testimonial />  */}
     
     </Layout>
   );

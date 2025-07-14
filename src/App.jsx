@@ -19,6 +19,7 @@ import { ProtectedRouteForUser } from "./protectedRoute/ProtectedRouteForUser";
 import { ProtectedRouteForAdmin } from "./protectedRoute/ProtectedRouteForAdmin";
 import CategoryPage from "./pages/category/CategoryPage";
 import CheckoutPage from "./pages/checkOut/CheckOut";
+import ContactUs from "./pages/contactUs/ContactUs";
 
 export default function App() {
   return (
@@ -27,9 +28,12 @@ export default function App() {
         <ScrollTop />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/contactus" element={<ContactUs />} />
           {/* <Route path="/*" element={<NoPage />} /> */}
           <Route path="/productinfo/:id" element={<ProductInfo />} />
-          <Route path="/cart" element={<CartPage />} />
+          <Route path="/cart" element={
+            <CartPage />
+            } />
           <Route path="/allproduct" element={<AllProduct />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
@@ -49,11 +53,11 @@ export default function App() {
               <AddProductPage />
             </ProtectedRouteForAdmin>
           } />
-         {/* <Route path="/update-product/:id" element={
+         <Route path="/update-product/:id" element={
             <ProtectedRouteForAdmin>
               <UpdateProductPage />
             </ProtectedRouteForAdmin>
-          } /> */}
+          } />
          <Route path="/checkout" element={<CheckoutPage />} />
 
         </Routes>

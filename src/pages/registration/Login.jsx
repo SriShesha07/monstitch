@@ -1,137 +1,57 @@
-/* eslint-disable react/no-unescaped-entities */
-import { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import myContext from "../../context/myContext";
+import React, { useEffect } from "react";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth, googleProvider } from "../../firebase/FirebaseConfig";
+import { useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import Layout from "../../componentss/layout/Layout";
 import toast from "react-hot-toast";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, fireDB } from "../../firebase/FirebaseConfig";
-import Loader from "../../componentss/loader/Loader";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
 
 const Login = () => {
-    const context = useContext(myContext);
-    const { loading, setLoading } = context;
+  const navigate = useNavigate();
 
-    // navigate 
-    const navigate = useNavigate();
+  // Redirect if user already signed in
+//   useEffect(() => {
+//     const unsubscribe = auth.onAuthStateChanged((user) => {
+//       if (user) {
+//         navigate("/");
+//       }
+//     });
+//     return () => unsubscribe();
+//   }, [navigate]);
 
-    // User Signup State 
-    const [userLogin, setUserLogin] = useState({
-        email: "",
-        password: ""
-    });
-
-    /**========================================================================
-     *                          User Login Function 
-    *========================================================================**/
-
-    const userLoginFunction = async () => {
-        // validation 
-        if (userLogin.email === "" || userLogin.password === "") {
-            toast.error("All Fields are required")
-        }
-
-        setLoading(true);
-        try {
-            const users = await signInWithEmailAndPassword(auth, userLogin.email, userLogin.password);
-            // console.log(users.user)
-
-            try {
-                const q = query(
-                    collection(fireDB, "user"),
-                    where('uid', '==', users?.user?.uid)
-                );
-                const data = onSnapshot(q, (QuerySnapshot) => {
-                    let user;
-                    QuerySnapshot.forEach((doc) => user = doc.data());
-                    localStorage.setItem("users", JSON.stringify(user) )
-                    setUserLogin({
-                        email: "",
-                        password: ""
-                    })
-                    toast.success("Login Successfully");
-                    setLoading(false);
-                    if(user.role === "user") {
-                        navigate('/user-dashboard');
-                    }else{
-                        navigate('/admin-dashboard');
-                    }
-                });
-                return () => data;
-            } catch (error) {
-                console.log(error);
-                setLoading(false);
-            }
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-            toast.error("Login Failed");
-        }
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      toast.success(`Welcome, ${user.displayName}`);
+      navigate("/");
+    } catch (error) {
+      console.error("Google sign-in error:", error.message);
     }
-    return (
-        <div className='flex justify-center items-center h-screen'>
-            {loading && <Loader />}
-            {/* Login Form  */}
-            <div className="login_Form bg-pink-50 px-8 py-6 border border-pink-100 rounded-xl shadow-md">
+  };
 
-                {/* Top Heading  */}
-                <div className="mb-5">
-                    <h2 className='text-center text-2xl font-bold text-pink-500 '>
-                        Login
-                    </h2>
-                </div>
+  return (
+    <Layout>
+     <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="bg-[#121212] rounded-2xl shadow-2xl p-8 max-w-sm w-full text-white text-center">
+        <h1 className="text-3xl font-bold mb-6">Welcome Back</h1>
+        <p className="text-gray-400 mb-8">Sign in to continue to <span className="text-white font-semibold">MONSTITCH</span></p>
+        
+        <button
+          onClick={handleGoogleLogin}
+          className="flex items-center justify-center gap-3 bg-white text-black py-2 px-6 rounded-full font-medium hover:shadow-lg transition duration-200 mx-auto"
+        >
+          <FcGoogle className="text-xl" />
+          Sign in with Google
+        </button>
 
-                {/* Input One  */}
-                <div className="mb-3">
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder='Email Address'
-                        value={userLogin.email}
-                        onChange={(e) => {
-                            setUserLogin({
-                                ...userLogin,
-                                email: e.target.value
-                            })
-                        }}
-                        className='bg-pink-50 border border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-200'
-                    />
-                </div>
-
-                {/* Input Two  */}
-                <div className="mb-5">
-                    <input
-                        type="password"
-                        placeholder='Password'
-                        value={userLogin.password}
-                        onChange={(e) => {
-                            setUserLogin({
-                                ...userLogin,
-                                password: e.target.value
-                            })
-                        }}
-                        className='bg-pink-50 border border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-200'
-                    />
-                </div>
-
-                {/* Signup Button  */}
-                <div className="mb-5">
-                    <button
-                        type='button'
-                        onClick={userLoginFunction}
-                        className='bg-pink-500 hover:bg-pink-600 w-full text-white text-center py-2 font-bold rounded-md '
-                    >
-                        Login
-                    </button>
-                </div>
-
-                <div>
-                    <h2 className='text-black'>Don't Have an account <Link className=' text-pink-500 font-bold' to={'/signup'}>Signup</Link></h2>
-                </div>
-
-            </div>
-        </div>
-    );
-}
+        <p className="mt-10 text-sm text-gray-500">
+          Don’t have an account? Just sign in with Google — it’s quick and easy!
+        </p>
+      </div>
+    </div>
+    </Layout>
+  );
+};
 
 export default Login;

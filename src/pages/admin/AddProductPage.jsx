@@ -176,7 +176,7 @@ const AddProductPage = () => {
                                     description: e.target.value
                                 })
                             }} name="description" placeholder="Product Description" rows="5" className=" w-full px-2 py-1 text-pink-300 bg-pink-50 border border-pink-200 rounded-md outline-none placeholder-pink-300 ">
-
+                                
                         </textarea>
                     </div>
 
