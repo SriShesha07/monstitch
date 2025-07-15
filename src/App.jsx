@@ -20,6 +20,10 @@ import { ProtectedRouteForAdmin } from "./protectedRoute/ProtectedRouteForAdmin"
 import CategoryPage from "./pages/category/CategoryPage";
 import CheckoutPage from "./pages/checkOut/CheckOut";
 import ContactUs from "./pages/contactUs/ContactUs";
+import PrivacyPolicy from "./pages/policies/PrivacyPolicy";
+import ShippingPolicy from "./pages/policies/ShippingPolicy";
+import CancellationPolicy from "./pages/policies/CancellationPolicy";
+import TermsAndConditions from "./pages/policies/TermsAndConditions";
 
 export default function App() {
   return (
@@ -63,6 +67,10 @@ export default function App() {
             <Route path="/update-product/:id"  element={<UpdateProductPage />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
          <Route path="/checkout" element={<CheckoutPage />} />
+         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+         <Route path="/shipping-policy" element={<ShippingPolicy />} />
+         <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+          <Route path="/termsandconditions" element={<TermsAndConditions />} />
 
         </Routes>
          <Toaster/>
