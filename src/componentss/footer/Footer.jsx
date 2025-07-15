@@ -18,7 +18,7 @@ const Footer = () => {
               Shipping & Delivery
             </Link>
             <Link to="/cancellation-policy" className="hover:text-white transition duration-300">
-              Cancellation and Refund
+              Cancellation & Refund
             </Link>
             <Link to="/termsandconditions" className="hover:text-white transition duration-300">
               Terms & Conditions
