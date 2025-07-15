@@ -38,7 +38,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
            <Route path="/category/:categoryname" element={<CategoryPage />} />
-         <Route path="/user-dashboard" element={
+         {/* <Route path="/user-dashboard" element={
             <ProtectedRouteForUser>
               <UserDashboard />
             </ProtectedRouteForUser>
@@ -57,7 +57,11 @@ export default function App() {
             <ProtectedRouteForAdmin>
               <UpdateProductPage />
             </ProtectedRouteForAdmin>
-          } />
+          } /> */}
+           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/add-product" element={<AddProductPage />}  />
+            <Route path="/update-product/:id"  element={<UpdateProductPage />} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
          <Route path="/checkout" element={<CheckoutPage />} />
 
         </Routes>

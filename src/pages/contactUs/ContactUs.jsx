@@ -1,8 +1,37 @@
 // Contact.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../../componentss/layout/Layout';
 
 const ContactUs = () => {
+   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  // On form submit
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const name = e.target.name.value;
+  const email = e.target.email.value;
+  const message = e.target.message.value;
+
+  const res = await fetch('/api/sendEmail', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, message }),
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert('Email sent successfully!');
+  } else {
+    alert('Email failed to send.');
+  }
+};
+
+
+
   return (
     <Layout>
     <div className="min-h-screen bg-black text-white px-4 py-10 font-sans">
@@ -29,15 +58,17 @@ const ContactUs = () => {
           Our team is ready to provide you with the support you need. We look forward to assisting you!
         </p>
 
-        <form className="space-y-4 text-black">
+        <form className="space-y-4 text-black" onSubmit={handleSubmit}>
           <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
+              name="name"
               placeholder="Name"
               className="w-full px-4 py-2 rounded-full border border-gray-400 focus:outline-none"
             />
             <input
               type="email"
+              name="email"
               placeholder="Email *"
               className="w-full px-4 py-2 rounded-full border border-gray-400 focus:outline-none"
             />
@@ -45,6 +76,7 @@ const ContactUs = () => {
 
           <input
             type="text"
+            name="phone"
             placeholder="Phone number"
             className="w-full px-4 py-2 rounded-full border border-gray-400 focus:outline-none"
           />
@@ -52,11 +84,13 @@ const ContactUs = () => {
           <textarea
             placeholder="Comment"
             rows={4}
+            name='message'
             className="w-full px-4 py-2 rounded-2xl border border-gray-400 focus:outline-none resize-none"
           ></textarea>
 
           <button
             type="submit"
+          
             className="bg-white text-black px-8 py-2 rounded-full font-semibold hover:bg-gray-200 transition"
           >
             Send
