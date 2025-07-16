@@ -134,7 +134,7 @@ const CheckoutPage = () => {
               phone: formData.phone,
             },
             cartItems: cartItems.map((item) => ({
-              name: item.name,
+              name: item.title,
               size: item.size,
               quantity: item.quantity,
               price: item.price,
