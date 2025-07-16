@@ -84,7 +84,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    const amount = total * 100;
+    const amount = total;
     const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
 
     const orderRes = await fetch("/api/createOrder", {
