@@ -8,12 +8,12 @@ import { getAuth, GoogleAuthProvider  } from 'firebase/auth';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBnp1MKTl_6I8dE6B22vduuLQ8zssbOy2Y",
-  authDomain: "monstitch-8969a.firebaseapp.com",
-  projectId: "monstitch-8969a",
-  storageBucket: "monstitch-8969a.firebasestorage.app",
-  messagingSenderId: "26217911849",
-  appId: "1:26217911849:web:7fa34395da6cea55faee38"
+  apiKey: process.env.FIREBASE_APIKEY,
+  authDomain: process.env.FIREBASE_AUTHDOMAIN,
+  projectId: process.env.FIREBASE_PROJECTID,
+  storageBucket: process.env.FIREBASE_STORAGEBUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGINGSENDERID,
+  appId: process.env.FIREBASE_APPID
 };
 
 // Initialize Firebase
