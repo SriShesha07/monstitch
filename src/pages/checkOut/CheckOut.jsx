@@ -110,7 +110,36 @@ const CheckoutPage = () => {
         });
 
         const { valid } = await verifyRes.json();
-
+        console.log({
+            order_id: response.razorpay_order_id,
+            payment_id: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            amount,
+            status: "success",
+            createdAt: new Date(),
+            firebaseUser: {
+              uid: user?.uid || "",
+              email: user?.email || "",
+              displayName: user?.displayName || "",
+            },
+            customer: {
+              email: formData.email,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              address: formData.address,
+              apartment: formData.apartment,
+              city: formData.city,
+              state: formData.state,
+              pin: formData.pin,
+              phone: formData.phone,
+            },
+            cartItems: cartItems.map((item) => ({
+              name: item.name,
+              size: item.size,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+          });
         if (valid) {
           await addDoc(collection(fireDB, "payments"), {
             order_id: response.razorpay_order_id,
