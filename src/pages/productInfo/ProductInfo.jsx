@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/cartSlice";
 import toast from "react-hot-toast";
 import Layout from "../../componentss/layout/Layout";
+import { auth } from "../../firebase/FirebaseConfig";
 
 const ProductInfo = () => {
   const { id } = useParams();
@@ -19,6 +20,12 @@ const ProductInfo = () => {
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
+     const user = auth.currentUser;
+     if (!user) {
+    toast.error("Please sign in to add items to cart.");
+    navigate("/login"); // or show a login modal
+    return;
+  }
     dispatch(addToCart({ ...product, size: selectedSize }));
     toast.success("Added to cart!");
     setTimeout(() => {

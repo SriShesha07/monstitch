@@ -1,9 +1,14 @@
 /* eslint-disable react/prop-types */
+import { getAuth } from "firebase/auth";
 import { Navigate } from "react-router"
 
 export const ProtectedRouteForUser = ({children}) => {
-    const user = JSON.parse(localStorage.getItem('users'))
-    if (user?.role === "user") {
+  const auth = getAuth();
+    const user = auth.currentUser;
+    console.log("ProtectedRouteForUser user:", user);
+    // const user = JSON.parse(localStorage.getItem('users'))
+    // if (user?.role === "user") {
+     if (user !== "" && user !== null) {
       return children
     }
     else {

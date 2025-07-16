@@ -24,6 +24,7 @@ import PrivacyPolicy from "./pages/policies/PrivacyPolicy";
 import ShippingPolicy from "./pages/policies/ShippingPolicy";
 import CancellationPolicy from "./pages/policies/CancellationPolicy";
 import TermsAndConditions from "./pages/policies/TermsAndConditions";
+import OrderSummary from "./pages/orders/OrderSummary";
 
 export default function App() {
   return (
@@ -36,7 +37,9 @@ export default function App() {
           {/* <Route path="/*" element={<NoPage />} /> */}
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route path="/cart" element={
+            <ProtectedRouteForUser>
             <CartPage />
+            </ProtectedRouteForUser>
             } />
           <Route path="/allproduct" element={<AllProduct />} />
           <Route path="/signup" element={<SignUp />} />
@@ -71,6 +74,7 @@ export default function App() {
          <Route path="/shipping-policy" element={<ShippingPolicy />} />
          <Route path="/cancellation-policy" element={<CancellationPolicy />} />
           <Route path="/termsandconditions" element={<TermsAndConditions />} />
+          <Route path="/orderSummary" element={<OrderSummary />} />
 
         </Routes>
          <Toaster/>
