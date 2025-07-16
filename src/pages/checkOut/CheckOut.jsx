@@ -112,7 +112,7 @@ const CheckoutPage = () => {
         const { valid } = await verifyRes.json();
 
         if (valid) {
-          await addDoc(collection(db, "payments"), {
+          await addDoc(collection(fireDB, "payments"), {
             order_id: response.razorpay_order_id,
             payment_id: response.razorpay_payment_id,
             signature: response.razorpay_signature,
