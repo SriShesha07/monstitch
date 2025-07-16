@@ -181,25 +181,62 @@ const CheckoutPage = () => {
             status: "success",
           });
           // Send confirmation email
-          await fetch("/api/sendEmail", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              to: formData.email,
-              name: `${formData.firstName} ${formData.lastName}`,
-              orderId: response.razorpay_order_id,
-              items: cartItems.map((item) => ({
-                name: item.name,
-                size: item.size,
-                quantity: item.quantity,
-                price: item.price,
-              })),
-              total,
-            }),
-          });
+          try {
+            const res = await fetch("/api/sendEmail", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                to: formData.email,
+                name: `${formData.firstName} ${formData.lastName}`,
+                orderId: response.razorpay_order_id,
+                items: cartItems.map((item) => ({
+                  name: item.name,
+                  size: item.size,
+                  quantity: item.quantity,
+                  price: item.price,
+                })),
+                total,
+              }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+              console.log("✅ Email sent successfully:", data);
+              // optionally show UI success message
+            } else {
+              console.error(
+                "❌ Email failed to send:",
+                data.error || data.message
+              );
+              // optionally show UI error message
+            }
+          } catch (err) {
+            console.error(
+              "❌ Network or server error while sending email:",
+              err
+            );
+            // optionally show UI error message
+          }
 
           localStorage.removeItem("cart"); // clear local storage
-          navigate("/orderSummary");
+
+          navigate("/orderSummary", {
+            state: {
+              orderDetails: {
+                order_id: response.razorpay_order_id,
+                amount,
+                createdAt: new Date(),
+                uid: user?.uid,
+                email: user?.email,
+                name: user?.displayName,
+                phone: formData.phone,
+                customer: formData,
+                cartItems,
+                status: "success",
+              },
+            },
+          });
         } else {
           navigate("/checkout");
         }
