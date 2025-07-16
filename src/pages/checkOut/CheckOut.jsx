@@ -20,55 +20,66 @@ const CheckoutPage = () => {
   const cartItems = useSelector((state) => state.cart);
   const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  const handlePayment = async () => {
-    try {
-      const { data } = await axios.post("/api/createOrder", {
-        amount: total * 100,
-        currency: "INR",
-      });
+   const loadScript = () =>
+    new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
 
-      const { order } = data;
+   const handlePayment = async () => {
+    const res = await loadScript();
+    if (!res) return alert("Razorpay SDK failed to load.");
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
-        name: "Monstitch Store",
-        description: "Order Payment",
-        order_id: order.id,
-        handler: async function (response) {
-          const verifyRes = await axios.post("/api/verifyPayment", {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            formData,
-            cartItems,
-            total,
+    const amount = 500; // ₹5.00
+    const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
+
+    const orderRes = await fetch("/api/createOrder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, receipt }),
+    });
+
+    const order = await orderRes.json();
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "My Store",
+      description: "Test Transaction",
+      order_id: order.id,
+      handler: async (response) => {
+        // verify on backend
+        const verifyRes = await fetch("/api/verifyPayment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response),
+        });
+
+        const { valid } = await verifyRes.json();
+
+        if (valid) {
+          await addDoc(collection(db, "payments"), {
+            order_id: response.razorpay_order_id,
+            payment_id: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            amount,
+            status: "success",
+            createdAt: new Date(),
           });
+          alert("Payment Successful");
+        } else {
+          alert("Payment Verification Failed");
+        }
+      },
+      theme: { color: "#3399cc" },
+    };
 
-          if (verifyRes.data.success) {
-            alert("✅ Payment successful!");
-            // Redirect or clear cart, etc.
-          } else {
-            alert("❌ Payment verification failed.");
-          }
-        },
-        prefill: {
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          contact: formData.phone,
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error) {
-      console.error("Payment error:", error);
-      alert("Something went wrong during payment.");
-    }
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   return (
