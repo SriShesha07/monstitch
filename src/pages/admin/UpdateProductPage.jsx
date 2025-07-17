@@ -40,7 +40,7 @@ const UpdateProductPage = () => {
     // navigate 
     const navigate = useNavigate();
     const { id } = useParams()
-    console.log(id)
+ 
 
     // product state
     const [product, setProduct] = useState({

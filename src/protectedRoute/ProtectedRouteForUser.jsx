@@ -5,7 +5,7 @@ import { Navigate } from "react-router"
 export const ProtectedRouteForUser = ({children}) => {
   const auth = getAuth();
     const user = auth.currentUser;
-    console.log("ProtectedRouteForUser user:", user);
+   
     // const user = JSON.parse(localStorage.getItem('users'))
     // if (user?.role === "user") {
      if (user !== "" && user !== null) {

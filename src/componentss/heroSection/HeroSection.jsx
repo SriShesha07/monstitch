@@ -6,7 +6,7 @@ export default function HeroSection() {
     <div className="w-full h-[500px] bg-black">
       <img
         className="w-full h-full object-contain"
-        src={Banner}
+        src="https://res.cloudinary.com/doh27cvlb/image/upload/v1752697040/banner_kntak8.jpg"
         alt="Hero Section Banner"
       />
     </div>

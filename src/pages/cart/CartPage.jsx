@@ -75,12 +75,12 @@ const CartPage = () => {
                   {/* Product Info */}
                   <div className="col-span-6 flex gap-4 items-center">
                     <img
-                      src={item.productImageUrl}
-                      alt={item.title}
+                      src={item.ImageUrl2}
+                      alt={item.name}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                     <div>
-                      <h2 className="font-semibold text-base">{item.title}</h2>
+                      <h2 className="font-semibold text-base">{item.name}</h2>
                       <p className="text-sm text-gray-400">
                         Rs. {Number(item.price).toFixed(2)}
                       </p>

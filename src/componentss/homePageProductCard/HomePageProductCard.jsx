@@ -12,7 +12,6 @@ const HomePageProductCard = () => {
   const { getAllProduct } = context;
   const cartItems = useSelector((state) => state.cart);
   const dispatch = useDispatch();
-console.log("Fetched products:", getAllProduct); 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
@@ -31,19 +30,19 @@ console.log("Fetched products:", getAllProduct);
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {getAllProduct.slice(0, 8).map((item, idx) => {
-              const { id, title, price, productImageUrl } = item;
+              const { id, name, price, ImageUrl2 } = item;
 
               return (
                 <div
                   key={id || idx}
                   className="group overflow-hidden bg-black rounded-xl shadow-lg border border-gray-700 flex flex-col justify-between"
                 >
-                {  console.log("ID:", id)}
+                
                   <div className="relative overflow-hidden rounded-t-xl">
                     <img
                       onClick={() => navigate(`/productinfo/${id}`)} // make sure to use _id if your route expects it
-                      src={productImageUrl}
-                      alt={title}
+                      src={ImageUrl2 }
+                      alt={name}
                       className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500 cursor-pointer"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-30 pointer-events-none"></div>
@@ -51,7 +50,7 @@ console.log("Fetched products:", getAllProduct);
 
                   <div className="flex flex-col flex-grow justify-between pt-4 px-4">
                     <h3 className="text-lg font-semibold text-white mb-2">
-                      {title?.substring(0, 30)}
+                      {name?.substring(0, 30)}
                     </h3>
                     <p className="text-md font-semibold text-white mb-4">
                       ₹{price}

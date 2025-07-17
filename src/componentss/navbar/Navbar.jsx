@@ -26,10 +26,10 @@ const Navbar = () => {
     }
   };
 
-//   const logout = () => {
-//     localStorage.clear("users");
-//     navigate("/login");
-//   };
+  //   const logout = () => {
+  //     localStorage.clear("users");
+  //     navigate("/login");
+  //   };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -93,12 +93,13 @@ const Navbar = () => {
               Logout
             </li>
           )}
-         <li>
-  <Link to="/cart">
-    Cart ({user !== null && user !== "" ? cartItems.length : 0})
-  </Link>
-</li>
-          
+          {user && (
+            <li>
+              <Link to="/cart">
+                Cart ({user !== null && user !== "" ? cartItems.length : 0})
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
 
@@ -132,9 +133,11 @@ const Navbar = () => {
                 Logout
               </li>
             )}
-            <li>
-              <Link to="/cart">Cart ({cartItems.length})</Link>
-            </li>
+            {user && (
+              <li>
+                <Link to="/cart">Cart ({cartItems.length})</Link>
+              </li>
+            )}
           </ul>
         </div>
       )}

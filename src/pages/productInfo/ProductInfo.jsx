@@ -7,6 +7,8 @@ import { addToCart } from "../../redux/cartSlice";
 import toast from "react-hot-toast";
 import Layout from "../../componentss/layout/Layout";
 import { auth } from "../../firebase/FirebaseConfig";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 const ProductInfo = () => {
   const { id } = useParams();
@@ -14,61 +16,70 @@ const ProductInfo = () => {
   const { getAllProduct } = useContext(myContext);
   const product = getAllProduct.find((p) => p.id === id);
 
-  const [selectedSize, setSelectedSize] = useState("S");
+  const [selectedSize, setSelectedSize] = useState("XS");
   const [quantity, setQuantity] = useState(1);
 
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
-     const user = auth.currentUser;
-     if (!user) {
-    toast.error("Please sign in to add items to cart.");
-    navigate("/login"); // or show a login modal
-    return;
-  }
+    const user = auth.currentUser;
+    if (!user) {
+      toast.error("Please sign in to add items to cart.");
+      navigate("/login"); // or show a login modal
+      return;
+    }
     dispatch(addToCart({ ...product, size: selectedSize }));
     toast.success("Added to cart!");
     setTimeout(() => {
-    navigate("/cart");
-  }, 500); 
+      navigate("/cart");
+    }, 500);
   };
 
   useEffect(() => window.scrollTo(0, 0), []);
 
   if (!product) return <p>Loading...</p>;
 
-  return (
-    <Layout>
+ return (
+  <Layout>
     <div className="min-h-screen bg-black text-white p-4">
-      <div className="container mx-auto flex flex-col lg:flex-row gap-8">
-        {/* Images */}
-        <div className="lg:w-1/2 flex flex-col gap-4">
-          {/* {product.images.map((img, idx) => (
-            <img
-              key={idx}
-              src={img}
-              alt={product.title}
-              className="h-[350px] w-full object-cover rounded-xl"
-            />
-          ))} */}
-          <img
-            className=" w-full lg:h-[39em] rounded-lg"
-            src={product?.productImageUrl}
-            alt=""
-          />
+      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Image 1 */}
+        <div className="w-full">
+          <Zoom>
+            <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
+              <img
+                src={product.ImageUrl1}
+                alt="Product Front"
+                className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
+          </Zoom>
         </div>
 
-        {/* Details */}
-        <div className="lg:w-1/2 flex flex-col justify-between">
+        {/* Image 2 */}
+        <div className="w-full">
+          <Zoom>
+            <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
+              <img
+                src={product.ImageUrl2}
+                alt="Product Back"
+                className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
+          </Zoom>
+        </div>
+
+        {/* Product Details */}
+        <div className="flex flex-col justify-between space-y-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
+            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
             <p className="text-gray-400 text-lg mb-4">Rs. {product.price}</p>
 
             {/* Size Selector */}
             <div className="mb-4">
               <h2 className="font-semibold mb-1">Size</h2>
               <div className="flex gap-3">
-                {["S", "M", "L", "XL"].map((size) => (
+                {["XS", "S", "M", "L", "XL"].map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -108,50 +119,40 @@ const ProductInfo = () => {
             <div className="space-y-4 mb-6">
               <button
                 onClick={handleAddToCart}
-                className="w-full py-3 border border-white rounded-full font-semibold hover:bg-white hover:text-black"
+                className="w-full py-3 border border-white rounded-full font-semibold hover:bg-white hover:text-black transition"
               >
                 Add to Cart
               </button>
-              {/* <button className="w-full py-3 bg-white text-black rounded-full font-semibold">
-                Buy it now
-              </button> */}
             </div>
 
             {/* Badges */}
             <div className="grid grid-cols-3 gap-4 text-center text-sm mb-6">
               <div>
-                <Store className="mx-auto" />
+                <Store className="mx-auto mb-1" />
                 <span>Trusted Seller</span>
               </div>
               <div>
-                <BadgeCheck className="mx-auto" />
+                <BadgeCheck className="mx-auto mb-1" />
                 <span>Assured Quality</span>
               </div>
               <div>
-                <Truck className="mx-auto" />
+                <Truck className="mx-auto mb-1" />
                 <span>Free Shipping</span>
               </div>
             </div>
 
-            {/* Description & Care */}
-            <div className="space-y-4 mb-4">
+            {/* Description */}
+            <div className="space-y-4">
               <h3 className="font-semibold text-xl">Product Description</h3>
               <p className="text-gray-400">{product.description}</p>
             </div>
-            {/* <div className="space-y-4">
-              <h3 className="font-semibold text-xl">Product Care</h3>
-              <ul className="list-disc list-inside text-gray-400">
-                {product.care.map((step, i) => (
-                  <li key={i}>{step}</li>
-                ))}
-              </ul>
-            </div> */}
           </div>
         </div>
       </div>
     </div>
-    </Layout>
-  );
+  </Layout>
+);
+
 };
 
 export default ProductInfo;

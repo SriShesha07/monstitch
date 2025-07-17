@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 
 
 const ProductModal = ({ isOpen, onClose, product }) => {
+  
   const [selectedSize, setSelectedSize] = useState("S");
   const [quantity, setQuantity] = useState(1);
 
@@ -24,7 +25,7 @@ const ProductModal = ({ isOpen, onClose, product }) => {
 
   if (!isOpen || !product) return null;
 
-  const sizes = ["S", "M", "L", "XL"];
+  const sizes = ["XS","S", "M", "L", "XL"];
 
   return (
     <div
@@ -39,8 +40,8 @@ const ProductModal = ({ isOpen, onClose, product }) => {
           {/* Left: Product Image */}
           <div className="md:w-1/2 bg-zinc-900 p-6 flex justify-center items-center rounded-l-2xl h-full">
             <img
-              src={product.productImageUrl}
-              alt={product.title}
+              src={product.ImageUrl2 }
+              alt={product.name}
               className="h-full w-full object-contain"
             />
           </div>
@@ -54,7 +55,7 @@ const ProductModal = ({ isOpen, onClose, product }) => {
               ×
             </button>
 
-            <h2 className="text-2xl font-bold mb-2">{product.title}</h2>
+            <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
             <p className="text-zinc-400 mb-4 text-lg">Rs. {product.price}</p>
 
             {/* Size selection */}
@@ -104,9 +105,9 @@ const ProductModal = ({ isOpen, onClose, product }) => {
               <button onClick={handleAddToCart} className="w-full py-3 rounded-full border border-white text-white hover:bg-white hover:text-black font-semibold transition">
                 Add to cart
               </button>
-              <button className="w-full py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition">
+              {/* <button className="w-full py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition">
                 Buy it now
-              </button>
+              </button> */}
             </div>
 
             {/* Icons section */}

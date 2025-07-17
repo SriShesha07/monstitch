@@ -21,7 +21,7 @@ const CheckoutSummary = () => {
           <div key={item.id} className="flex gap-4 items-start relative">
             <div className="relative">
               <img
-                src={item.productImageUrl}
+                src={item.ImageUrl2}
                 alt={item.title}
                 className="w-16 h-16 rounded-md object-cover"
               />
@@ -30,7 +30,7 @@ const CheckoutSummary = () => {
               </span>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold">{item.title}</p>
+              <p className="text-sm font-semibold">{item.name}</p>
               <p className="text-xs text-gray-400">Size: {item.size}</p>
             </div>
             <div className="text-sm font-medium whitespace-nowrap">

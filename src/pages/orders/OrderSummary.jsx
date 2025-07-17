@@ -46,7 +46,7 @@ const OrderSummary = () => {
           <p className="text-center text-gray-400 mb-10">
             We've received your order and sent a confirmation to{" "}
             <span className="text-white font-medium">
-              {firebaseUser?.email}
+              {customer.email}
             </span>
             .
           </p>
@@ -58,9 +58,9 @@ const OrderSummary = () => {
               <p>
                 <span className="text-white">Order ID:</span> {order_id}
               </p>
-              <p>
+              {/* <p>
                 <span className="text-white">Payment ID:</span> {payment_id}
-              </p>
+              </p> */}
               <p>
                 <span className="text-white">Status:</span> {status}
               </p>

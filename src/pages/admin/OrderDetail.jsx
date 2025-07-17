@@ -100,7 +100,7 @@ const OrderDetail = () => {
 
                             </tr>
                             {getAllOrder.map((order) => {
-                                console.log(order)
+                              
                                 return (
                                     <>
                                         {order.cartItems.map((item, index) => {

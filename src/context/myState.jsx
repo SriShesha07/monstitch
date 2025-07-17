@@ -21,7 +21,7 @@ function MyState({ children }) {
         try {
             const q = query(
                 collection(fireDB, "products"),
-                orderBy('time')
+                orderBy('productId')
             );
             const data = onSnapshot(q, (QuerySnapshot) => {
                 let productArray = [];

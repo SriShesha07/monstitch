@@ -41,7 +41,7 @@ const AllProduct = () => {
           <div className="container px-4 mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {getAllProduct.map((item, idx) => {
-                const { id, title, price, productImageUrl } = item;
+                const { id, name, price, ImageUrl2, ImageUrl1 } = item;
                 const inCart = cartItems.some((p) => p.id === id);
 
                 return (
@@ -53,8 +53,8 @@ const AllProduct = () => {
                     <div className="relative overflow-hidden rounded-t-xl">
                       <img
                         onClick={() => navigate(`/productinfo/${id}`)}
-                        src={productImageUrl}
-                        alt={title}
+                        src={ImageUrl2}
+                        alt={name}
                         className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500 cursor-pointer"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-30 pointer-events-none"></div>
@@ -63,7 +63,7 @@ const AllProduct = () => {
                     {/* Content */}
                     <div className="flex flex-col flex-grow justify-between pt-4 px-4">
                       <h3 className="text-lg font-semibold text-white mb-2">
-                        {title.length > 30 ? title.substring(0, 27) + "..." : title}
+                        {name.length > 30 ? name.substring(0, 27) + "..." : name}
                       </h3>
                       <p className="text-md font-semibold text-white mb-4">₹{price}</p>
                     </div>

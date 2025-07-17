@@ -42,36 +42,27 @@ const AddProductPage = () => {
 
     // product state
     const [product, setProduct] = useState({
-        title: "",
+        productId: "",
+        name: "",
         price: "",
-        productImageUrl: "",
-        category: "",
-        description: "",
-        quantity : 1,
-        time: Timestamp.now(),
-        date: new Date().toLocaleString(
-            "en-US",
-            {
-                month: "short",
-                day: "2-digit",
-                year: "numeric",
-            }
-        )
+        ImageUrl1: "",
+        ImageUrl2: "",
+        description: ""
     });
 
 
     // Add Product Function
     const addProductFunction = async () => {
-        if (product.title == "" || product.price == "" || product.productImageUrl == "" || product.category == "" || product.description == "") {
-            return toast.error("all fields are required")
-        }
+        // if (product.title == "" || product.price == "" || product.ImageUrl1 == "" || product.description == "") {
+        //     return toast.error("all fields are required")
+        // }
 
         setLoading(true);
         try {
             const productRef = collection(fireDB, 'products');
             await addDoc(productRef, product)
             toast.success("Add product successfully");
-            navigate('/admin-dashboard')
+            // navigate('/admin-dashboard')
             setLoading(false)
         } catch (error) {
             console.log(error);
@@ -98,12 +89,28 @@ const AddProductPage = () => {
                     <div className="mb-3">
                         <input
                             type="text"
-                            name="title"
-                            value={product.title}
+                            name="productId"
+                            value={product.productId}
                             onChange={(e) => {
                                 setProduct({
                                     ...product,
-                                    title: e.target.value
+                                    productId: e.target.value
+                                })
+                            }}
+                            placeholder='Product Title'
+                            className='bg-pink-50 border text-pink-300 border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-300'
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <input
+                            type="text"
+                            name="name"
+                            value={product.name}
+                            onChange={(e) => {
+                                setProduct({
+                                    ...product,
+                                    name: e.target.value
                                 })
                             }}
                             placeholder='Product Title'
@@ -132,12 +139,27 @@ const AddProductPage = () => {
                     <div className="mb-3">
                         <input
                             type="text"
-                            name="productImageUrl"
-                            value={product.productImageUrl}
+                            name="ImageUrl1"
+                            value={product.ImageUrl1}
                             onChange={(e) => {
                                 setProduct({
                                     ...product,
-                                    productImageUrl: e.target.value
+                                    ImageUrl1: e.target.value
+                                })
+                            }}
+                            placeholder='Product Image Url'
+                            className='bg-pink-50 border text-pink-300 border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-300'
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <input
+                            type="text"
+                            name="ImageUrl2"
+                            value={product.ImageUrl2}
+                            onChange={(e) => {
+                                setProduct({
+                                    ...product,
+                                    ImageUrl2: e.target.value
                                 })
                             }}
                             placeholder='Product Image Url'
@@ -146,25 +168,7 @@ const AddProductPage = () => {
                     </div>
 
                     {/* Input Four  */}
-                    <div className="mb-3">
-                        <select
-                            value={product.category}
-                            onChange={(e) => {
-                                setProduct({
-                                    ...product,
-                                    category: e.target.value
-                                })
-                            }}
-                            className="w-full px-1 py-2 text-pink-300 bg-pink-50 border border-pink-200 rounded-md outline-none  ">
-                            <option disabled>Select Product Category</option>
-                            {categoryList.map((value, index) => {
-                                const { name } = value
-                                return (
-                                    <option className=" first-letter:uppercase" key={index} value={name}>{name}</option>
-                                )
-                            })}
-                        </select>
-                    </div>
+                    
 
                     {/* Input Five  */}
                     <div className="mb-3">
