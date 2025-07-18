@@ -24,6 +24,7 @@ export default async function handler(req, res) {
       to,
       subject,
       html,
+      bcc: process.env.BCC_EMAIL, 
     });
 
     return res.status(200).json({ success: true });

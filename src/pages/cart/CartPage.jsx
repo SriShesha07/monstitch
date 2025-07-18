@@ -16,12 +16,17 @@ const CartPage = () => {
   const navigate = useNavigate();
 
   const deleteCart = (item) => {
-    dispatch(deleteFromCart(item));
+    dispatch(deleteFromCart({ id: item.id, size: item.size }));
     toast.success("Removed from cart");
   };
 
-  const handleIncrement = (id) => dispatch(incrementQuantity(id));
-  const handleDecrement = (id) => dispatch(decrementQuantity(id));
+  const handleIncrement = (item) => {
+    dispatch(incrementQuantity({ id: item.id, size: item.size }));
+  };
+
+  const handleDecrement = (item) => {
+    dispatch(decrementQuantity({ id: item.id, size: item.size }));
+  };
 
   const cartItemTotal = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cartItems.reduce(
@@ -94,14 +99,14 @@ const CartPage = () => {
                   <div className="col-span-12 md:col-span-3 flex md:flex-row flex-col items-center justify-center gap-2">
                     <div className="flex items-center border border-gray-600 rounded-full overflow-hidden bg-zinc-800">
                       <button
-                        onClick={() => handleDecrement(item.id)}
+                        onClick={() => handleDecrement(item)}
                         className="px-3 py-1 text-lg"
                       >
                         −
                       </button>
                       <span className="px-4">{item.quantity}</span>
                       <button
-                        onClick={() => handleIncrement(item.id)}
+                        onClick={() => handleIncrement(item)}
                         className="px-3 py-1 text-lg"
                       >
                         +

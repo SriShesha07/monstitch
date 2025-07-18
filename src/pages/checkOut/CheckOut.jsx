@@ -163,43 +163,51 @@ const CheckoutPage = () => {
             )
             .join("<br/>");
 
-         const emailHtml = `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; background-color: #111; color: #eee; padding: 20px; border-radius: 10px; border: 1px solid #333;">
-    <h2 style="color: #ffffff;">Hi ${formData.firstName} ${formData.lastName},</h2>
-    
-    <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
+        const emailHtml = `
+  <div style="font-family: Arial, sans-serif; background-color: #111; color: #eee; padding: 20px;">
+    <div style="max-width: 700px; width: 100%; margin: 0 auto; background-color: #111; padding: 30px; border-radius: 10px; border: 1px solid #333;">
+      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${formData.lastName},</h2>
+      
+      <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
 
-    <hr style="border-color: #444; margin: 20px 0;" />
+      <hr style="border-color: #444; margin: 20px 0;" />
 
-    <p><strong style="color: #fff;">Order ID:</strong> ${response.razorpay_order_id}</p>
+      <p><strong style="color: #fff;">Order ID:</strong> ${response.razorpay_order_id}</p>
 
-    <div style="margin-top: 15px;">
-      <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
-      <ul style="list-style: none; padding: 0;">
-        ${cartItems
-          .map(
-            (item) => `
-            <li style="margin-bottom: 6px;">
-              <span style="color: #ccc;">• ${item.name}</span>
-              <span style="color: #999;">(${item.size})</span>
-              <span style="color: #aaa;">x${item.quantity}</span>
-              <span style="float: right;">₹${item.price * item.quantity}</span>
-            </li>`
-          )
-          .join("")}
-      </ul>
+      <div style="margin-top: 15px;">
+        <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
+        <table style="width: 100%; border-collapse: collapse;">
+          ${cartItems
+            .map(
+              (item) => `
+              <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 10px 0;">
+                  <img src="${item.ImageUrl1}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
+                </td>
+                <td style="padding: 10px; vertical-align: top;">
+                  <div style="color: #fff; font-weight: bold;">${item.name}</div>
+                  <div style="color: #aaa;">Size: ${item.size}</div>
+                  <div style="color: #aaa;">Qty: ${item.quantity}</div>
+                </td>
+                <td style="padding: 10px; vertical-align: top; text-align: right; color: #fff;">
+                  ₹${item.price * item.quantity}
+                </td>
+              </tr>`
+            )
+            .join("")}
+        </table>
+      </div>
+
+      <p style="margin-top: 20px;"><strong style="color: #fff;">Total Amount:</strong> ₹${total}</p>
+
+      <hr style="border-color: #444; margin: 20px 0;" />
+
+      <p style="line-height: 1.6;">We’ll send you another email when your order ships.</p>
+
+      <p style="margin-top: 30px;">Cheers,<br/><strong style="color: #ff4d00;">– Monstitch Team</strong></p>
     </div>
-
-    <p style="margin-top: 20px;"><strong style="color: #fff;">Total Amount:</strong> ₹${total}</p>
-
-    <hr style="border-color: #444; margin: 20px 0;" />
-
-    <p style="line-height: 1.6;">We’ll send you another email when your order ships.</p>
-
-    <p style="margin-top: 30px;">Cheers,<br/><strong style="color: #ff4d00;">– Monstitch Team</strong></p>
   </div>
 `;
-
 
           try {
             const res = await fetch("/api/sendEmail", {
