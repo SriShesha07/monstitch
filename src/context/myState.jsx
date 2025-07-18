@@ -54,8 +54,8 @@ function MyState({ children }) {
         setLoading(true);
         try {
             const q = query(
-                collection(fireDB, "order"),
-                orderBy('time')
+                collection(fireDB, "orders"),
+                orderBy('createdAt', 'asc')
             );
             const data = onSnapshot(q, (QuerySnapshot) => {
                 let orderArray = [];

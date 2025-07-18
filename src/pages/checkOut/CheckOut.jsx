@@ -78,10 +78,11 @@ const CheckoutPage = () => {
 
   const handlePayment = async () => {
     if (!validateForm()) return;
-
+    //  setIsLoading(true); // 🔵 Start loading
     const res = await loadScript();
     if (!res) {
       console.error("Razorpay SDK failed to load.");
+      // setIsLoading(false); // 🔴 Stop loading
       return;
     }
 
@@ -111,7 +112,7 @@ const CheckoutPage = () => {
         });
 
         const { valid } = await verifyRes.json();
-       
+
         if (valid) {
           await addDoc(collection(fireDB, "payments"), {
             order_id: response.razorpay_order_id,
@@ -144,7 +145,7 @@ const CheckoutPage = () => {
 
             // Cart details
             cartItems: cartItems.map((item) => ({
-              name: item.title || "",
+              name: item.name || "",
               size: item.size || "",
               quantity: item.quantity,
               price: item.price,
@@ -153,21 +154,61 @@ const CheckoutPage = () => {
             status: "success",
           });
           // Send confirmation email
+          const itemListHTML = cartItems
+            .map(
+              (item) =>
+                `• ${item.name} (${item.size}) x${item.quantity} - ₹${
+                  item.quantity * item.price
+                }`
+            )
+            .join("<br/>");
+
+         const emailHtml = `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; background-color: #111; color: #eee; padding: 20px; border-radius: 10px; border: 1px solid #333;">
+    <h2 style="color: #ffffff;">Hi ${formData.firstName} ${formData.lastName},</h2>
+    
+    <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
+
+    <hr style="border-color: #444; margin: 20px 0;" />
+
+    <p><strong style="color: #fff;">Order ID:</strong> ${response.razorpay_order_id}</p>
+
+    <div style="margin-top: 15px;">
+      <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
+      <ul style="list-style: none; padding: 0;">
+        ${cartItems
+          .map(
+            (item) => `
+            <li style="margin-bottom: 6px;">
+              <span style="color: #ccc;">• ${item.name}</span>
+              <span style="color: #999;">(${item.size})</span>
+              <span style="color: #aaa;">x${item.quantity}</span>
+              <span style="float: right;">₹${item.price * item.quantity}</span>
+            </li>`
+          )
+          .join("")}
+      </ul>
+    </div>
+
+    <p style="margin-top: 20px;"><strong style="color: #fff;">Total Amount:</strong> ₹${total}</p>
+
+    <hr style="border-color: #444; margin: 20px 0;" />
+
+    <p style="line-height: 1.6;">We’ll send you another email when your order ships.</p>
+
+    <p style="margin-top: 30px;">Cheers,<br/><strong style="color: #ff4d00;">– Monstitch Team</strong></p>
+  </div>
+`;
+
+
           try {
             const res = await fetch("/api/sendEmail", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 to: formData.email,
-                name: `${formData.firstName} ${formData.lastName}`,
-                orderId: response.razorpay_order_id,
-                items: cartItems.map((item) => ({
-                  name: item.name,
-                  size: item.size,
-                  quantity: item.quantity,
-                  price: item.price,
-                })),
-                total,
+                subject: `Order Confirmation - ${response.razorpay_order_id}`,
+                html: emailHtml,
               }),
             });
 
@@ -175,22 +216,20 @@ const CheckoutPage = () => {
 
             if (res.ok) {
               console.log("✅ Email sent successfully:", data);
-              // optionally show UI success message
             } else {
               console.error(
                 "❌ Email failed to send:",
                 data.error || data.message
               );
-              // optionally show UI error message
             }
           } catch (err) {
             console.error(
               "❌ Network or server error while sending email:",
               err
             );
-            // optionally show UI error message
           }
-          
+
+          // setIsLoading(false); // ✅ Done loading after everything
           toast.success(`Order placed successfully!`);
           localStorage.removeItem("cart"); // clear local storage
 

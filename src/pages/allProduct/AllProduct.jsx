@@ -30,7 +30,7 @@ const AllProduct = () => {
 
   return (
     <Layout>
-      <div className="py-8 bg-black min-h-screen text-white">
+      <div className="py-8 bg-black text-white">
         {/* Heading */}
         <div className="mb-8">
           <h1 className="text-center text-3xl font-bold tracking-wide">ALL PRODUCTS</h1>

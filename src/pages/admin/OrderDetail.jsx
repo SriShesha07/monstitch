@@ -1,187 +1,132 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import myContext from "../../context/myContext";
 
 const OrderDetail = () => {
-    const context = useContext(myContext);
-    const { getAllOrder, deleteProduct } = context;
-    // console.log(getAllOrder)
-    return (
-        <div>
-            <div>
-                <div className="py-5">
-                    {/* text  */}
-                    <h1 className=" text-xl text-white font-bold">All Order</h1>
-                </div>
+  const context = useContext(myContext);
+  const { getAllOrder, deleteProduct } = context;
 
-                {/* table  */}
-                <div className="w-full overflow-x-auto">
-                    <table className="w-full text-left border border-collapse sm:border-separate border-white text-white" >
-                        <tbody>
-                            <tr>
-                                <th scope="col" className="h-12 px-6 text-md border-l first:border-l-0 border-white text-slate-700 bg-slate-100 font-bold fontPara">
-                                    S.No.
-                                </th>
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Order Id
-                                </th>
+  const openModal = (order) => setSelectedOrder(order);
+  const closeModal = () => setSelectedOrder(null);
 
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Image
-                                </th>
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl text-white font-bold mb-4">All Orders</h1>
 
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Title
-                                </th>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border border-white text-white">
+          <thead className="bg-slate-100 text-slate-700 font-bold">
+            <tr>
+              <th className="px-4 py-2 border">S.No.</th>
+              <th className="px-4 py-2 border">Order ID</th>
+              <th className="px-4 py-2 border">Total Items</th>
+              <th className="px-4 py-2 border">Total Amount</th>
+              <th className="px-4 py-2 border">Status</th>
+              <th className="px-4 py-2 border">Customer</th>
+              <th className="px-4 py-2 border">Address</th>
+              <th className="px-4 py-2 border">Phone</th>
+              <th className="px-4 py-2 border">Email</th>
+              <th className="px-4 py-2 border">Date</th>
+              <th className="px-4 py-2 border">Items</th>
+              <th className="px-4 py-2 border">Action</th>
+            </tr>
+          </thead>
 
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Category
-                                </th>
+          <tbody>
+            {getAllOrder.map((order, index) => {
+              const totalAmount = order.cartItems.reduce(
+                (acc, item) => acc + item.quantity * parseFloat(item.price),
+                0
+              );
 
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Price
-                                </th>
+              return (
+                <tr key={order.order_id} className="text-white">
+                  <td className="px-4 py-2 border">{index + 1}</td>
+                  <td className="px-4 py-2 border">{order.order_id}</td>
+                  <td className="px-4 py-2 border">{order.cartItems.length}</td>
+                  <td className="px-4 py-2 border">₹{totalAmount}</td>
+                  <td className="px-4 py-2 border text-green-500">{order.status}</td>
+                  <td className="px-4 py-2 border">
+                    {order.firstName} {order.lastName}
+                  </td>
+                  <td className="px-4 py-2 border">{order.address}</td>
+                  <td className="px-4 py-2 border">{order.phone}</td>
+                  <td className="px-4 py-2 border">{order.email}</td>
+                  <td className="px-4 py-2 border">
+                    {new Date(order.createdAt).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 border">
+                    <button
+                      onClick={() => openModal(order)}
+                      className="text-blue-400 hover:text-blue-300 underline"
+                    >
+                      View Items
+                    </button>
+                  </td>
+                  <td
+                    className="px-4 py-2 border text-red-500 cursor-pointer"
+                    onClick={() => deleteProduct(order.order_id)}
+                  >
+                    Delete
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Quantity
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Total Price
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Status
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Name
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Address
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Pincode
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Phone Number
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Email
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Date
-                                </th>
-
-                                <th scope="col"
-                                    className="h-12 px-6 text-md font-bold fontPara border-l first:border-l-0 border-white text-slate-700 bg-slate-100">
-                                    Action
-                                </th>
-
-
-                            </tr>
-                            {getAllOrder.map((order) => {
-                              
-                                return (
-                                    <>
-                                        {order.cartItems.map((item, index) => {
-                                            const { id, productImageUrl, title, category, price, quantity } = item
-                                            return (
-                                                <tr key={index} className="text-white">
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 ">
-                                                        {index + 1}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 ">
-                                                        {id}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        <img src={productImageUrl} alt="img" />
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {title}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {category}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        ₹{price}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {quantity}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        ₹{price * quantity}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l text-green-600  first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {order.status}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {order.addressInfo.name}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {order.addressInfo.address}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {order.addressInfo.pincode}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {order.addressInfo.mobileNumber}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 ">
-                                                        {order.email}
-                                                    </td>
-
-                                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 first-letter:uppercase ">
-                                                        {order.date}
-                                                    </td>
-
-                                                    <td onClick={()=> deleteProduct(order.id)} className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-white stroke-slate-500 text-slate-500 text-red-500 cursor-pointer ">
-                                                        Delete
-                                                    </td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+      {/* Modal for order items */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto p-6 border border-gray-700">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                🛒 Order Items - {selectedOrder.order_id}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="text-red-400 hover:text-red-300 text-sm font-semibold"
+              >
+                ✖ Close
+              </button>
             </div>
+
+            <table className="w-full text-sm text-left text-white">
+              <thead className="bg-gray-800 border-b border-gray-600">
+                <tr>
+                  <th className="px-4 py-3 border">#</th>
+                  <th className="px-4 py-3 border">Product Name</th>
+                  <th className="px-4 py-3 border">Size</th>
+                  <th className="px-4 py-3 border">Price</th>
+                  <th className="px-4 py-3 border">Qty</th>
+                  <th className="px-4 py-3 border">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedOrder.cartItems.map((item, idx) => (
+                  <tr
+                    key={idx}
+                    className="border-b border-gray-700 hover:bg-gray-800"
+                  >
+                    <td className="px-4 py-2 border">{idx + 1}</td>
+                    <td className="px-4 py-2 border">{item.name || "Unnamed"}</td>
+                    <td className="px-4 py-2 border">{item.size}</td>
+                    <td className="px-4 py-2 border">₹{item.price}</td>
+                    <td className="px-4 py-2 border">{item.quantity}</td>
+                    <td className="px-4 py-2 border">
+                      ₹{item.quantity * item.price}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-    );
-}
+      )}
+    </div>
+  );
+};
 
 export default OrderDetail;

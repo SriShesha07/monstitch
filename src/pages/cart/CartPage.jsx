@@ -35,7 +35,7 @@ const CartPage = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-black text-white py-12">
+      <div className="bg-black text-white py-12">
         <div className="container mx-auto max-w-6xl px-4">
           {/* Top Header */}
           <div className="flex justify-between items-center mb-6">
