@@ -9,6 +9,8 @@ import { getAuth } from "firebase/auth/cordova";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { clearCart } from "../../redux/cartSlice";
+const [isLoading, setIsLoading] = useState(false);
+
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -79,11 +81,11 @@ const CheckoutPage = () => {
 
   const handlePayment = async () => {
     if (!validateForm()) return;
-    //  setIsLoading(true); // 🔵 Start loading
+    setIsLoading(true); // 🔵 Start loading
     const res = await loadScript();
     if (!res) {
       console.error("Razorpay SDK failed to load.");
-      // setIsLoading(false); // 🔴 Stop loading
+      setIsLoading(false); // 🔴 Stop loading
       return;
     }
 
@@ -106,6 +108,8 @@ const CheckoutPage = () => {
       description: "Test Transaction",
       order_id: order.id,
       handler: async (response) => {
+        // Show loading during verification
+      setIsLoading(true);
         const verifyRes = await fetch("/api/verifyPayment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -164,20 +168,16 @@ const CheckoutPage = () => {
             )
             .join("<br/>");
 
-          const emailHtml = `
+         const emailHtml = `
   <div style="font-family: Arial, sans-serif; background-color: #111; color: #eee; padding: 20px;">
     <div style="max-width: 700px; width: 100%; margin: 0 auto; background-color: #111; padding: 30px; border-radius: 10px; border: 1px solid #333;">
-      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${
-            formData.lastName
-          },</h2>
+      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${formData.lastName},</h2>
       
       <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
 
       <hr style="border-color: #444; margin: 20px 0;" />
 
-      <p><strong style="color: #fff;">Order ID:</strong> ${
-        response.razorpay_order_id
-      }</p>
+      <p><strong style="color: #fff;">Order ID:</strong> ${response.razorpay_order_id}</p>
 
       <div style="margin-top: 15px;">
         <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
@@ -187,14 +187,10 @@ const CheckoutPage = () => {
               (item) => `
               <tr style="border-bottom: 1px solid #444;">
                 <td style="padding: 10px 0;">
-                  <img src="${item.ImageUrl1}" alt="${
-                item.name
-              }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
+                  <img src="${item.ImageUrl1}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
                 </td>
                 <td style="padding: 10px; vertical-align: top;">
-                  <div style="color: #fff; font-weight: bold;">${
-                    item.name
-                  }</div>
+                  <div style="color: #fff; font-weight: bold;">${item.name}</div>
                   <div style="color: #aaa;">Size: ${item.size}</div>
                   <div style="color: #aaa;">Qty: ${item.quantity}</div>
                 </td>
@@ -211,12 +207,25 @@ const CheckoutPage = () => {
 
       <hr style="border-color: #444; margin: 20px 0;" />
 
+      <div style="margin-top: 20px;">
+        <p style="margin-bottom: 6px;"><strong style="color: #fff;">Shipping Address:</strong></p>
+        <p style="color: #ccc; line-height: 1.6;">
+          ${formData.address}<br/>
+          ${formData.city}, ${formData.state} - ${formData.pincode}<br/>
+          ${formData.country}<br/>
+          <strong>Phone:</strong> ${formData.phone}
+        </p>
+      </div>
+
+      <hr style="border-color: #444; margin: 20px 0;" />
+
       <p style="line-height: 1.6;">We’ll send you another email when your order ships.</p>
 
       <p style="margin-top: 30px;">Cheers,<br/><strong style="color: #ff4d00;">– Monstitch Team</strong></p>
     </div>
   </div>
 `;
+
 
           try {
             const res = await fetch("/api/sendEmail", {
@@ -251,7 +260,7 @@ const CheckoutPage = () => {
           dispatch(clearCart());
           localStorage.removeItem("cart"); // clear local storage
           toast.success(`Order placed successfully!`);
-
+setIsLoading(false); // ✅ Stop loader before navigation
           navigate("/orderSummary", {
             state: {
               orderDetails: {
@@ -269,6 +278,7 @@ const CheckoutPage = () => {
             },
           });
         } else {
+          setIsLoading(false);
           navigate("/checkout");
         }
       },
@@ -291,6 +301,12 @@ const CheckoutPage = () => {
 
   return (
     <Layout>
+      {isLoading && (
+      <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+      </div>
+    )}
+
       <div className="min-h-screen bg-black text-white font-sans">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-6 py-10">
           <div className="space-y-8">
