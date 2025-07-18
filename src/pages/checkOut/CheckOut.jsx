@@ -9,12 +9,12 @@ import { getAuth } from "firebase/auth/cordova";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { clearCart } from "../../redux/cartSlice";
-const [isLoading, setIsLoading] = useState(false);
+
 
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-
+const [isLoading, setIsLoading] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
 
