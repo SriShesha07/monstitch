@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth/cordova";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { clearCart } from "../../redux/cartSlice";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -163,16 +164,20 @@ const CheckoutPage = () => {
             )
             .join("<br/>");
 
-        const emailHtml = `
+          const emailHtml = `
   <div style="font-family: Arial, sans-serif; background-color: #111; color: #eee; padding: 20px;">
     <div style="max-width: 700px; width: 100%; margin: 0 auto; background-color: #111; padding: 30px; border-radius: 10px; border: 1px solid #333;">
-      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${formData.lastName},</h2>
+      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${
+            formData.lastName
+          },</h2>
       
       <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
 
       <hr style="border-color: #444; margin: 20px 0;" />
 
-      <p><strong style="color: #fff;">Order ID:</strong> ${response.razorpay_order_id}</p>
+      <p><strong style="color: #fff;">Order ID:</strong> ${
+        response.razorpay_order_id
+      }</p>
 
       <div style="margin-top: 15px;">
         <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
@@ -182,10 +187,14 @@ const CheckoutPage = () => {
               (item) => `
               <tr style="border-bottom: 1px solid #444;">
                 <td style="padding: 10px 0;">
-                  <img src="${item.ImageUrl1}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
+                  <img src="${item.ImageUrl1}" alt="${
+                item.name
+              }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
                 </td>
                 <td style="padding: 10px; vertical-align: top;">
-                  <div style="color: #fff; font-weight: bold;">${item.name}</div>
+                  <div style="color: #fff; font-weight: bold;">${
+                    item.name
+                  }</div>
                   <div style="color: #aaa;">Size: ${item.size}</div>
                   <div style="color: #aaa;">Qty: ${item.quantity}</div>
                 </td>
@@ -238,8 +247,10 @@ const CheckoutPage = () => {
           }
 
           // setIsLoading(false); // ✅ Done loading after everything
-          toast.success(`Order placed successfully!`);
+
+          dispatch(clearCart());
           localStorage.removeItem("cart"); // clear local storage
+          toast.success(`Order placed successfully!`);
 
           navigate("/orderSummary", {
             state: {
