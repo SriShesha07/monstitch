@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CheckoutSummary from "../checkOut/CheckoutSummary";
 import Layout from "../../componentss/layout/Layout";
 import { addDoc, collection } from "firebase/firestore";
@@ -12,7 +12,11 @@ import { clearCart } from "../../redux/cartSlice";
 
 
 
+
+
 const CheckoutPage = () => {
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
 const [isLoading, setIsLoading] = useState(false);
   const auth = getAuth();
