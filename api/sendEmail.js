@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         user: process.env.SMTP_EMAIL,
         pass: process.env.SMTP_APP_PASSWORD,
       },
-    });
+    }); 
 
     await transporter.sendMail({
       from: `"Monstitch" <${process.env.SMTP_EMAIL}>`,
