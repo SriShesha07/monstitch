@@ -10,15 +10,11 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { clearCart } from "../../redux/cartSlice";
 
-
-
-
-
 const CheckoutPage = () => {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
-const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -101,18 +97,23 @@ const [isLoading, setIsLoading] = useState(false);
     //   headers: { "Content-Type": "application/json" },
     //   body: JSON.stringify({ amount, receipt }),
     // });
-    const orderRes = await fetch("/api/createOrder", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    cartItems: cartItems.map((item) => ({
-      id: item.productId, // Ensure `id` exists in cart
-      quantity: item.quantity,
-    })),
-    receipt,
-  }),
-});
-
+   try{
+    console.log("🔍 Creating order with Razorpay");
+     const orderRes = await fetch("/api/createOrder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cartItems: cartItems.map((item) => ({
+          id: item.productId, // Ensure `id` exists in cart
+          quantity: item.quantity,
+        })),
+        receipt,
+      }),
+    });
+   }
+   catch (error) {
+    console.log("❌ Error creating order:", error);
+   }
 
     const order = await orderRes.json();
 
@@ -125,7 +126,7 @@ const [isLoading, setIsLoading] = useState(false);
       order_id: order.id,
       handler: async (response) => {
         // Show loading during verification
-      setIsLoading(true);
+        setIsLoading(true);
         const verifyRes = await fetch("/api/verifyPayment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -184,16 +185,20 @@ const [isLoading, setIsLoading] = useState(false);
             )
             .join("<br/>");
 
-         const emailHtml = `
+          const emailHtml = `
   <div style="font-family: Arial, sans-serif; background-color: #111; color: #eee; padding: 20px;">
     <div style="max-width: 700px; width: 100%; margin: 0 auto; background-color: #111; padding: 30px; border-radius: 10px; border: 1px solid #333;">
-      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${formData.lastName},</h2>
+      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${
+            formData.lastName
+          },</h2>
       
       <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
 
       <hr style="border-color: #444; margin: 20px 0;" />
 
-      <p><strong style="color: #fff;">Order ID:</strong> ${response.razorpay_order_id}</p>
+      <p><strong style="color: #fff;">Order ID:</strong> ${
+        response.razorpay_order_id
+      }</p>
 
       <div style="margin-top: 15px;">
         <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
@@ -203,10 +208,14 @@ const [isLoading, setIsLoading] = useState(false);
               (item) => `
               <tr style="border-bottom: 1px solid #444;">
                 <td style="padding: 10px 0;">
-                  <img src="${item.ImageUrl1}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
+                  <img src="${item.ImageUrl1}" alt="${
+                item.name
+              }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
                 </td>
                 <td style="padding: 10px; vertical-align: top;">
-                  <div style="color: #fff; font-weight: bold;">${item.name}</div>
+                  <div style="color: #fff; font-weight: bold;">${
+                    item.name
+                  }</div>
                   <div style="color: #aaa;">Size: ${item.size}</div>
                   <div style="color: #aaa;">Qty: ${item.quantity}</div>
                 </td>
@@ -239,7 +248,6 @@ const [isLoading, setIsLoading] = useState(false);
     </div>
   </div>
 `;
-
 
           try {
             const res = await fetch("/api/sendEmail", {
@@ -274,7 +282,7 @@ const [isLoading, setIsLoading] = useState(false);
           dispatch(clearCart());
           localStorage.removeItem("cart"); // clear local storage
           toast.success(`Order placed successfully!`);
-setIsLoading(false); // ✅ Stop loader before navigation
+          setIsLoading(false); // ✅ Stop loader before navigation
           navigate("/orderSummary", {
             state: {
               orderDetails: {
@@ -316,10 +324,10 @@ setIsLoading(false); // ✅ Stop loader before navigation
   return (
     <Layout>
       {isLoading && (
-      <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
-      </div>
-    )}
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
+        </div>
+      )}
 
       <div className="min-h-screen bg-black text-white font-sans">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-6 py-10">
