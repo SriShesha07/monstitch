@@ -29,7 +29,7 @@ const HomePageProductCard = () => {
       <section className="text-white">
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {getAllProduct.slice(0, 8).map((item, idx) => {
+            {getAllProduct.map((item, idx) => {
               const { id, name, price, ImageUrl2 } = item;
 
               return (

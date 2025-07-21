@@ -96,11 +96,23 @@ const [isLoading, setIsLoading] = useState(false);
     const amount = total;
     const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
 
+    // const orderRes = await fetch("/api/createOrder", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ amount, receipt }),
+    // });
     const orderRes = await fetch("/api/createOrder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, receipt }),
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    cartItems: cartItems.map((item) => ({
+      id: item.productId, // Ensure `id` exists in cart
+      quantity: item.quantity,
+    })),
+    receipt,
+  }),
+});
+
 
     const order = await orderRes.json();
 
@@ -215,15 +227,13 @@ const [isLoading, setIsLoading] = useState(false);
         <p style="margin-bottom: 6px;"><strong style="color: #fff;">Shipping Address:</strong></p>
         <p style="color: #ccc; line-height: 1.6;">
           ${formData.address}<br/>
-          ${formData.city}, ${formData.state} - ${formData.pincode}<br/>
-          ${formData.country}<br/>
+          ${formData.city}, ${formData.state} - ${formData.pin}<br/>
+         
           <strong>Phone:</strong> ${formData.phone}
         </p>
       </div>
 
       <hr style="border-color: #444; margin: 20px 0;" />
-
-      <p style="line-height: 1.6;">We’ll send you another email when your order ships.</p>
 
       <p style="margin-top: 30px;">Cheers,<br/><strong style="color: #ff4d00;">– Monstitch Team</strong></p>
     </div>

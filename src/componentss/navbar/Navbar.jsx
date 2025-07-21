@@ -3,6 +3,11 @@ import SearchBar from "../searchBar/SearchBar";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
+import toast from "react-hot-toast";
+import { useEffect } from "react";
+import { doc } from "firebase/firestore";
+import { fireDB } from "../../firebase/FirebaseConfig";
+import { getDoc } from "firebase/firestore";
 
 const Navbar = () => {
   // const user = JSON.parse(localStorage.getItem("users"));
@@ -12,6 +17,27 @@ const Navbar = () => {
 
   const auth = getAuth();
   const user = auth.currentUser;
+
+   const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      try {
+        const userRef = doc(fireDB, "user", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().role === "admin") {
+          setIsAdmin(true);
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
+    };
+
+    fetchRole();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -70,22 +96,36 @@ const Navbar = () => {
           <li>
             <Link to="/">Home</Link>
           </li>
-          <li>
+          {/* <li>
             <Link to="/allproduct">All Product</Link>
-          </li>
+          </li> */}
           {!user && (
             <li>
               <Link to="/login">Sign In</Link>
             </li>
           )}
-          {user?.role === "user" && (
+          {/* {user?.role === "user" && (
             <li>
               <Link to="/user-dashboard">User</Link>
             </li>
-          )}
-          {user?.role === "admin" && (
+          )} */}
+          {isAdmin  && (
             <li>
               <Link to="/admin-dashboard">Admin</Link>
+            </li>
+          )}
+           {user && (
+            <li>
+              <Link to="/myOrders">
+                My Orders
+              </Link>
+            </li>
+          )}
+ {user && (
+            <li>
+              <Link to="/cart">
+                Cart ({user !== null && user !== "" ? cartItems.length : 0})
+              </Link>
             </li>
           )}
           {user && (
@@ -93,13 +133,7 @@ const Navbar = () => {
               Logout
             </li>
           )}
-          {user && (
-            <li>
-              <Link to="/cart">
-                Cart ({user !== null && user !== "" ? cartItems.length : 0})
-              </Link>
-            </li>
-          )}
+         
         </ul>
       </div>
 
@@ -123,21 +157,30 @@ const Navbar = () => {
                 <Link to="/user-dashboard">User</Link>
               </li>
             )}
-            {user?.role === "admin" && (
+            {isAdmin && (
               <li>
                 <Link to="/admin-dashboard">Admin</Link>
               </li>
             )}
             {user && (
-              <li className="cursor-pointer" onClick={logout}>
-                Logout
-              </li>
-            )}
-            {user && (
-              <li>
-                <Link to="/cart">Cart ({cartItems.length})</Link>
-              </li>
-            )}
+            <li>
+              <Link to="/myOrders">
+                My Orders
+              </Link>
+            </li>
+          )}
+ {user && (
+            <li>
+              <Link to="/cart">
+                Cart ({user !== null && user !== "" ? cartItems.length : 0})
+              </Link>
+            </li>
+          )}
+          {user && (
+            <li className="cursor-pointer" onClick={handleLogout}>
+              Logout
+            </li>
+          )}
           </ul>
         </div>
       )}

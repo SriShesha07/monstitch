@@ -25,6 +25,8 @@ import ShippingPolicy from "./pages/policies/ShippingPolicy";
 import CancellationPolicy from "./pages/policies/CancellationPolicy";
 import TermsAndConditions from "./pages/policies/TermsAndConditions";
 import OrderSummary from "./pages/orders/OrderSummary";
+import MyOrders from "./pages/orders/myOrders";
+import AboutUs from "./pages/policies/aboutUs";
 
 export default function App() {
   return (
@@ -65,7 +67,7 @@ export default function App() {
               <UpdateProductPage />
             </ProtectedRouteForAdmin>
           } /> */}
-           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+           <Route path="/admin-dashboard" element={ <ProtectedRouteForAdmin><AdminDashboard /> </ProtectedRouteForAdmin>} />
             <Route path="/add-product" element={<AddProductPage />}  />
             <Route path="/update-product/:id"  element={<UpdateProductPage />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
@@ -75,6 +77,9 @@ export default function App() {
          <Route path="/cancellation-policy" element={<CancellationPolicy />} />
           <Route path="/termsandconditions" element={<TermsAndConditions />} />
           <Route path="/orderSummary" element={<OrderSummary />} />
+          <Route path="/myOrders" element={<MyOrders />} />
+<Route path="/aboutUs" element={<AboutUs />} />
+
 
         </Routes>
          <Toaster/>
