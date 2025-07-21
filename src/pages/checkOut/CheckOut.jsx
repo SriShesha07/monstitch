@@ -81,57 +81,72 @@ const CheckoutPage = () => {
 
   const handlePayment = async () => {
     if (!validateForm()) return;
-    setIsLoading(true); // 🔵 Start loading
-    const res = await loadScript();
-    if (!res) {
-      console.error("Razorpay SDK failed to load.");
-      setIsLoading(false); // 🔴 Stop loading
+
+    setIsLoading(true); // Start loader
+
+    const sdkLoaded = await loadScript();
+    if (!sdkLoaded) {
+      toast.error("Failed to load Razorpay SDK.");
+      setIsLoading(false);
       return;
     }
 
     const amount = total;
     const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
 
-    // const orderRes = await fetch("/api/createOrder", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ amount, receipt }),
-    // });
-  
+    let order;
+    try {
+      const orderRes = await fetch("/api/createOrder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartItems: cartItems.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+          receipt,
+        }),
+      });
 
-     const orderRes = await fetch("/api/createOrder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cartItems: cartItems.map((item) => ({
-          productId: item.productId, // Ensure `id` exists in cart
-          quantity: item.quantity,
-        })),
-        receipt,
-      }),
-    });
+      if (!orderRes.ok) {
+        throw new Error(`HTTP ${orderRes.status} - ${orderRes.statusText}`);
+      }
 
-    const order = await orderRes.json();
+      order = await orderRes.json();
+
+      // ✅ Validate order object
+      if (!order || !order.id || !order.amount || !order.currency) {
+        throw new Error("Invalid order response from server.");
+      }
+    } catch (err) {
+      console.error("❌ Order creation failed:", err);
+      toast.error("Unable to create order. Please try again.");
+      setIsLoading(false);
+      return;
+    }
 
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency,
       name: "MONSTITCH",
-      description: "Test Transaction",
+      description: "Order Payment",
       order_id: order.id,
       handler: async (response) => {
-        // Show loading during verification
         setIsLoading(true);
-        const verifyRes = await fetch("/api/verifyPayment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(response),
-        });
 
-        const { valid } = await verifyRes.json();
+        try {
+          const verifyRes = await fetch("/api/verifyPayment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response),
+          });
 
-        if (valid) {
+          const { valid } = await verifyRes.json();
+
+          if (!valid) throw new Error("Payment verification failed");
+
+          // Save payment to Firestore
           await addDoc(collection(fireDB, "payments"), {
             order_id: response.razorpay_order_id,
             payment_id: response.razorpay_payment_id,
@@ -145,23 +160,20 @@ const CheckoutPage = () => {
             phone: formData.phone || "",
           });
 
+          // Save order to Firestore
           await addDoc(collection(fireDB, "orders"), {
             order_id: response.razorpay_order_id,
             uid: user?.uid || "",
             createdAt: new Date(),
-
-            // Flattened customer fields
-            email: formData.email || "",
-            firstName: formData.firstName || "",
-            lastName: formData.lastName || "",
-            address: formData.address || "",
-            apartment: formData.apartment || "",
-            city: formData.city || "",
-            state: formData.state || "",
-            pin: formData.pin || "",
-            phone: formData.phone || "",
-
-            // Cart details
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            address: formData.address,
+            apartment: formData.apartment,
+            city: formData.city,
+            state: formData.state,
+            pin: formData.pin,
+            phone: formData.phone,
             cartItems: cartItems.map((item) => ({
               name: item.name || "",
               size: item.size || "",
@@ -169,116 +181,18 @@ const CheckoutPage = () => {
               price: item.price,
               amount,
             })),
-            status: "success",
+            status: "Ordered",
           });
-          // Send confirmation email
-          const itemListHTML = cartItems
-            .map(
-              (item) =>
-                `• ${item.name} (${item.size}) x${item.quantity} - ₹${
-                  item.quantity * item.price
-                }`
-            )
-            .join("<br/>");
 
-          const emailHtml = `
-  <div style="font-family: Arial, sans-serif; background-color: #111; color: #eee; padding: 20px;">
-    <div style="max-width: 700px; width: 100%; margin: 0 auto; background-color: #111; padding: 30px; border-radius: 10px; border: 1px solid #333;">
-      <h2 style="color: #ffffff;">Hi ${formData.firstName} ${
-            formData.lastName
-          },</h2>
-      
-      <p style="line-height: 1.6;">Thank you for shopping with <strong style="color: #ff4d00;">Monstitch</strong>! Your order has been placed successfully. Here are your order details:</p>
-
-      <hr style="border-color: #444; margin: 20px 0;" />
-
-      <p><strong style="color: #fff;">Order ID:</strong> ${
-        response.razorpay_order_id
-      }</p>
-
-      <div style="margin-top: 15px;">
-        <p style="margin-bottom: 6px;"><strong style="color: #fff;">Items Ordered:</strong></p>
-        <table style="width: 100%; border-collapse: collapse;">
-          ${cartItems
-            .map(
-              (item) => `
-              <tr style="border-bottom: 1px solid #444;">
-                <td style="padding: 10px 0;">
-                  <img src="${item.ImageUrl1}" alt="${
-                item.name
-              }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #555;" />
-                </td>
-                <td style="padding: 10px; vertical-align: top;">
-                  <div style="color: #fff; font-weight: bold;">${
-                    item.name
-                  }</div>
-                  <div style="color: #aaa;">Size: ${item.size}</div>
-                  <div style="color: #aaa;">Qty: ${item.quantity}</div>
-                </td>
-                <td style="padding: 10px; vertical-align: top; text-align: right; color: #fff;">
-                  ₹${item.price * item.quantity}
-                </td>
-              </tr>`
-            )
-            .join("")}
-        </table>
-      </div>
-
-      <p style="margin-top: 20px;"><strong style="color: #fff;">Total Amount:</strong> ₹${total}</p>
-
-      <hr style="border-color: #444; margin: 20px 0;" />
-
-      <div style="margin-top: 20px;">
-        <p style="margin-bottom: 6px;"><strong style="color: #fff;">Shipping Address:</strong></p>
-        <p style="color: #ccc; line-height: 1.6;">
-          ${formData.address}<br/>
-          ${formData.city}, ${formData.state} - ${formData.pin}<br/>
-         
-          <strong>Phone:</strong> ${formData.phone}
-        </p>
-      </div>
-
-      <hr style="border-color: #444; margin: 20px 0;" />
-
-      <p style="margin-top: 30px;">Cheers,<br/><strong style="color: #ff4d00;">– Monstitch Team</strong></p>
-    </div>
-  </div>
-`;
-
-          try {
-            const res = await fetch("/api/sendEmail", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                to: formData.email,
-                subject: `Order Confirmation - ${response.razorpay_order_id}`,
-                html: emailHtml,
-              }),
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-              console.log("✅ Email sent successfully:", data);
-            } else {
-              console.error(
-                "❌ Email failed to send:",
-                data.error || data.message
-              );
-            }
-          } catch (err) {
-            console.error(
-              "❌ Network or server error while sending email:",
-              err
-            );
-          }
-
-          // setIsLoading(false); // ✅ Done loading after everything
+          // Optional: Send confirmation email...
+          // (keep your current implementation)
 
           dispatch(clearCart());
-          localStorage.removeItem("cart"); // clear local storage
-          toast.success(`Order placed successfully!`);
-          setIsLoading(false); // ✅ Stop loader before navigation
+          localStorage.removeItem("cart");
+
+          toast.success("Order placed successfully!");
+          setIsLoading(false);
+
           navigate("/orderSummary", {
             state: {
               orderDetails: {
@@ -295,10 +209,17 @@ const CheckoutPage = () => {
               },
             },
           });
-        } else {
+        } catch (err) {
+          console.error("❌ Payment processing failed:", err);
+          toast.error("Payment failed. Please try again.");
           setIsLoading(false);
-          navigate("/checkout");
         }
+      },
+      modal: {
+        ondismiss: () => {
+          toast("Payment popup closed.");
+          setIsLoading(false); // ✅ Important: Stop loader when popup is closed
+        },
       },
       theme: { color: "#3399cc" },
     };

@@ -28,7 +28,7 @@ const ProductInfo = () => {
       navigate("/login"); // or show a login modal
       return;
     }
-    dispatch(addToCart({ ...product, size: selectedSize }));
+    dispatch(addToCart({ ...product, size: selectedSize ,quantity }));
     toast.success("Added to cart!");
     setTimeout(() => {
       navigate("/cart");
