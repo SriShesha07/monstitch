@@ -5,6 +5,7 @@ import { getFirestore } from "firebase-admin/firestore";
 // Parse Firebase service account JSON and log basic structure
 let serviceAccount;
 try {
+  console.log(  "🔍 Parsing FIREBASE_SERVICE_ACCOUNT_JSON");
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
   console.log("✅ Firebase service account loaded");
 } catch (error) {
