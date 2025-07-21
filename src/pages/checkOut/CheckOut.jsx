@@ -97,8 +97,8 @@ const CheckoutPage = () => {
     //   headers: { "Content-Type": "application/json" },
     //   body: JSON.stringify({ amount, receipt }),
     // });
-   try{
-    console.log("🔍 Creating order with Razorpay");
+  
+
      const orderRes = await fetch("/api/createOrder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -110,10 +110,6 @@ const CheckoutPage = () => {
         receipt,
       }),
     });
-   }
-   catch (error) {
-    console.log("❌ Error creating order:", error);
-   }
 
     const order = await orderRes.json();
 
