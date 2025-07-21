@@ -47,15 +47,16 @@ export default async function handler(req, res) {
     let totalAmount = 0;
     for (const item of cartItems) {
       console.log(`🔍 Fetching product ID: ${item.productId}`);
-      const productRef = db.collection("products").doc(item.productId);
-      const productSnap = await productRef.get();
+      const productsRef = db.collection("products");
+const querySnapshot = await productsRef.where("productId", "==", item.productId).get();
 
-      if (!productSnap.exists) {
+      if (querySnapshot.empty) {
         console.error(`❌ Product not found: ${item.productId}`);
         return res.status(404).json({ error: `Product not found: ${item.productId}` });
       }
 
-      const productData = productSnap.data();
+      const productData = querySnapshot.docs[0].data()
+      console.log(`✅ Product found: ${item.productId}`, productData);
       const price = productData.price;
       const itemTotal = price * item.quantity;
       totalAmount += itemTotal;
