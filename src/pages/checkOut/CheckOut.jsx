@@ -104,7 +104,7 @@ const CheckoutPage = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         cartItems: cartItems.map((item) => ({
-          id: item.productId, // Ensure `id` exists in cart
+          productId: item.productId, // Ensure `id` exists in cart
           quantity: item.quantity,
         })),
         receipt,
