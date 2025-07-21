@@ -3,8 +3,12 @@ import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 // Initialize Firebase Admin (ensure this only runs once)
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
-
+try {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+  console.log("✅ Firebase service account loaded");
+} catch (error) {
+  console.error("❌ Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON", error);
+}
 if (!global.firebaseAdminInitialized) {
   initializeApp({ credential: cert(serviceAccount) });
   global.firebaseAdminInitialized = true;
