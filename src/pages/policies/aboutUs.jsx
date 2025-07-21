@@ -50,7 +50,7 @@ const AboutUs = () => {
         </section>
 
         {/* Product Line */}
-        <section className="mb-10">
+        {/* <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-3">Product Line</h2>
           <ul className="list-disc list-inside text-gray-300 space-y-2">
             <li>Graphic T-Shirts</li>
@@ -62,10 +62,10 @@ const AboutUs = () => {
           <p className="text-gray-300 mt-2">
             New collections are launched quarterly, keeping in tune with seasonal trends and customer feedback.
           </p>
-        </section>
+        </section> */}
 
         {/* Target Audience */}
-        <section className="mb-10">
+        {/* <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-3">Target Audience</h2>
           <ul className="list-disc list-inside text-gray-300 space-y-2">
             <li>Gen Z and Millennials</li>
@@ -73,10 +73,10 @@ const AboutUs = () => {
             <li>Ages 16 to 30</li>
             <li>Style-conscious and socially aware individuals</li>
           </ul>
-        </section>
+        </section> */}
 
         {/* Business Model */}
-        <section className="mb-10">
+        {/* <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-3">Business Model</h2>
           <ul className="list-disc list-inside text-gray-300 space-y-2">
             <li>D2C (Direct to Consumer) via our official website and social media</li>
@@ -84,7 +84,7 @@ const AboutUs = () => {
             <li>Collaborations with local artists, musicians, and influencers</li>
             <li>Pop-up shops in select cities</li>
           </ul>
-        </section>
+        </section> */}
 
         {/* Contact */}
         <section className="mb-10">
