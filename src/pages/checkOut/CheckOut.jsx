@@ -185,7 +185,72 @@ const CheckoutPage = () => {
           });
 
           // Optional: Send confirmation email...
-          // (keep your current implementation)
+          // Add this function inside your CheckoutPage component (before the return statement)
+          const sendConfirmationEmail = async (orderDetails) => {
+            const { email, firstName, lastName, cartItems, amount, order_id } =
+              orderDetails;
+
+            const html = `
+    <div style="background-color: #000; color: #fff; padding: 20px; font-family: Arial, sans-serif;">
+      <h2 style="color: #00FFAA">Monstitch - Order Confirmation</h2>
+      <p>Hi ${firstName} ${lastName},</p>
+      <p>Thank you for your order! Your order <strong>#${order_id}</strong> has been successfully placed.</p>
+
+      <h3 style="margin-top: 30px; color: #00FFAA">Order Summary</h3>
+      <table style="width: 100%; border-collapse: collapse; color: #ddd;">
+        <thead>
+          <tr>
+            <th align="left">Product</th>
+            <th align="left">Size</th>
+            <th align="center">Qty</th>
+            <th align="right">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${cartItems
+            .map(
+              (item) => `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.size}</td>
+                <td align="center">${item.quantity}</td>
+                <td align="right">₹${item.price}</td>
+              </tr>`
+            )
+            .join("")}
+        </tbody>
+      </table>
+
+      <p style="margin-top: 20px;">Shipping: ₹20.00</p>
+      <h3>Total: ₹${(amount + 20).toFixed(2)}</h3>
+
+      <p style="margin-top: 40px;">We’ll notify you when your order is shipped.</p>
+      <p>Thanks for shopping with Monstitch.</p>
+    </div>
+  `;
+
+            try {
+              await fetch("/api/sendEmail", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  to: email,
+                  subject: "Order Confirmation - Monstitch",
+                  html,
+                }),
+              });
+            } catch (error) {
+              console.error("Failed to send confirmation email:", error);
+            }
+          };
+await sendConfirmationEmail({
+  email: formData.email,
+  firstName: formData.firstName,
+  lastName: formData.lastName,
+  cartItems,
+  amount,
+  order_id: response.razorpay_order_id,
+});
 
           dispatch(clearCart());
           localStorage.removeItem("cart");
