@@ -16,7 +16,7 @@ const OrderDetail = () => {
   const closeModal = () => setSelectedOrder(null);
 
   const markAsShipped = async (order) => {
-    const { id, email, firstName, lastName, order_id, cartItems, amount } =
+    const { id, email, firstName, lastName, order_id, cartItems, totalPaid } =
       order;
 
     try {
@@ -25,42 +25,59 @@ const OrderDetail = () => {
       const orderRef = doc(fireDB, "orders", id);
       await updateDoc(orderRef, { status: "Shipped" });
 
-      const emailHTML = `
-        <div style="background-color:#000; color:#fff; padding:20px; font-family:sans-serif">
-          <h2 style="color:#00FFAA">Monstitch - Order Shipped</h2>
-          <p>Hi ${firstName} ${lastName},</p>
-          <p>Your order <strong>#${order_id}</strong> has been shipped! 🎉</p>
+     const emailHTML = `
+  <div style="background-color:#0d0d0d;padding:30px;font-family:sans-serif;color:#fff;">
+    <div style="max-width:600px;margin:auto;background-color:#1a1a1a;padding:30px;border-radius:8px;border:1px solid #333;">
+      <h2 style="color:#fff;margin-top:0;">Hi ${firstName} ${lastName},</h2>
+      <p style="color:#ccc;">
+        Great news! Your order from <span style="color:orange;font-weight:bold;">Monstitch</span> has been <strong style="color:#00FFAA;">shipped</strong> and is on its way to you. Here's what you ordered:
+      </p>
 
-          <h3 style="margin-top:30px; color:#00FFAA">Order Summary</h3>
-          <table style="width:100%; border-collapse:collapse; color:#ddd;">
-            <thead>
-              <tr>
-                <th align="left">Product</th>
-                <th align="left">Size</th>
-                <th align="center">Qty</th>
-                <th align="right">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${cartItems
-                .map(
-                  (item) => `
-                <tr>
-                  <td>${item.name}</td>
-                  <td>${item.size}</td>
-                  <td align="center">${item.quantity}</td>
-                  <td align="right">₹${item.price}</td>
-                </tr>`
-                )
-                .join("")}
-            </tbody>
-          </table>
+      <hr style="border:1px solid #333;margin:20px 0;">
 
-          <p style="margin-top:20px;">Shipping: ₹20.00</p>
-          <h3>Total: ₹${amount + 20}</h3>
-          <p style="margin-top:30px;">Thank you for shopping with us 💖</p>
+      <p><strong>Order ID:</strong> ${order_id}</p>
+
+      <h3 style="margin-bottom:10px;">Items Shipped:</h3>
+
+      ${cartItems
+        .map(
+          (item) => `
+        <div style="display:flex;align-items:center;margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;">
+          <img src="${item.ImageUrl2}" alt="${item.name}" width="60" height="60" style="border-radius:4px;margin-right:15px;">
+          <div style="flex:1;">
+            <p style="margin:0;color:#fff;font-weight:600;">${item.name}</p>
+            <p style="margin:0;font-size:14px;color:#aaa;">Size: ${item.size}</p>
+            <p style="margin:0;font-size:14px;color:#aaa;">Qty: ${item.quantity}</p>
+          </div>
+          <div style="color:#fff;font-weight:500;">₹${item.price}</div>
         </div>
-      `;
+      `
+        )
+        .join("")}
+
+      <hr style="border:1px solid #333;margin:20px 0;">
+
+      <p><strong>Total Amount:</strong> ₹${(amount + 20).toFixed(2)} (including ₹20 shipping)</p>
+
+      <hr style="border:1px solid #333;margin:20px 0;">
+
+      <h3>Shipping Address:</h3>
+      <p style="color:#ccc;line-height:1.6;">
+        ${address}<br />
+        ${city}, ${state} - ${pin}<br />
+        <strong>Phone:</strong> ${phone}
+      </p>
+
+      <hr style="border:1px solid #333;margin:20px 0;">
+
+      <p style="color:#bbb;">
+        We hope you love your purchase! If you have any questions, feel free to reach out to us anytime.<br />
+        <br />
+        <span style="color:orange;font-weight:bold;">– Monstitch Team</span>
+      </p>
+    </div>
+  </div>
+`;
 
       await axios.post("/api/sendEmail", {
         to: email,
