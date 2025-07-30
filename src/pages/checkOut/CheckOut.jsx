@@ -187,62 +187,86 @@ const CheckoutPage = () => {
           // Optional: Send confirmation email...
           // Add this function inside your CheckoutPage component (before the return statement)
           const sendConfirmationEmail = async (orderDetails) => {
-            const { email, firstName, lastName, cartItems, amount, order_id } =
-              orderDetails;
+  const {
+    email,
+    firstName,
+    lastName,
+    cartItems,
+    amount,
+    order_id,
+    address,
+    city,
+    state,
+    pin,
+    phone,
+  } = orderDetails;
 
-            const html = `
-    <div style="background-color: #000; color: #fff; padding: 20px; font-family: Arial, sans-serif;">
-      <h2 style="color: #00FFAA">Monstitch - Order Confirmation</h2>
-      <p>Hi ${firstName} ${lastName},</p>
-      <p>Thank you for your order! Your order <strong>#${order_id}</strong> has been successfully placed.</p>
+  const html = `
+    <div style="background-color:#0d0d0d;padding:30px;font-family:sans-serif;color:#fff;">
+      <div style="max-width:600px;margin:auto;background-color:#1a1a1a;padding:30px;border-radius:8px;border:1px solid #333;">
+        <h2 style="color:#fff;margin-top:0;">Hi ${firstName} ${lastName},</h2>
+        <p style="color:#ccc;">
+          Thank you for shopping with <span style="color:orange;font-weight:bold;">Monstitch</span>! Your order has been placed successfully. Here are your order details:
+        </p>
 
-      <h3 style="margin-top: 30px; color: #00FFAA">Order Summary</h3>
-      <table style="width: 100%; border-collapse: collapse; color: #ddd;">
-        <thead>
-          <tr>
-            <th align="left">Product</th>
-            <th align="left">Size</th>
-            <th align="center">Qty</th>
-            <th align="right">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${cartItems
-            .map(
-              (item) => `
-              <tr>
-                <td>${item.name}</td>
-                <td>${item.size}</td>
-                <td align="center">${item.quantity}</td>
-                <td align="right">₹${item.price}</td>
-              </tr>`
-            )
-            .join("")}
-        </tbody>
-      </table>
+        <hr style="border:1px solid #333;margin:20px 0;">
 
-      <p style="margin-top: 20px;">Shipping: ₹20.00</p>
-      <h3>Total: ₹${(amount + 20).toFixed(2)}</h3>
+        <p><strong>Order ID:</strong> ${order_id}</p>
 
-      <p style="margin-top: 40px;">We’ll notify you when your order is shipped.</p>
-      <p>Thanks for shopping with Monstitch.</p>
+        <h3 style="margin-bottom:10px;">Items Ordered:</h3>
+
+        ${cartItems
+          .map(
+            (item) => `
+          <div style="display:flex;align-items:center;margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;">
+            <img src="${item.ImageUrl2}" alt="${item.name}" width="60" height="60" style="border-radius:4px;margin-right:15px;">
+            <div style="flex:1;">
+              <p style="margin:0;color:#fff;font-weight:600;">${item.name}</p>
+              <p style="margin:0;font-size:14px;color:#aaa;">Size: ${item.size}</p>
+              <p style="margin:0;font-size:14px;color:#aaa;">Qty: ${item.quantity}</p>
+            </div>
+            <div style="color:#fff;font-weight:500;">₹${item.price}</div>
+          </div>
+        `
+          )
+          .join("")}
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <p><strong>Total Amount:</strong> ₹${(amount + 20).toFixed(2)}</p>
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <h3>Shipping Address:</h3>
+        <p style="color:#ccc;line-height:1.6;">
+          ${address}<br />
+          ${city}, ${state} - ${pin}<br />
+          <strong>Phone:</strong> ${phone}
+        </p>
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <p style="color:#bbb;">Cheers,<br />
+        <span style="color:orange;font-weight:bold;">– Monstitch Team</span></p>
+      </div>
     </div>
   `;
 
-            try {
-              await fetch("/api/sendEmail", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  to: email,
-                  subject: "Order Confirmation - Monstitch",
-                  html,
-                }),
-              });
-            } catch (error) {
-              console.error("Failed to send confirmation email:", error);
-            }
-          };
+  try {
+    await fetch("/api/sendEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: email,
+        subject: "Order Confirmation - Monstitch",
+        html,
+      }),
+    });
+  } catch (error) {
+    console.error("Failed to send confirmation email:", error);
+  }
+};
+
 await sendConfirmationEmail({
   email: formData.email,
   firstName: formData.firstName,
@@ -250,7 +274,13 @@ await sendConfirmationEmail({
   cartItems,
   amount,
   order_id: response.razorpay_order_id,
+  address: formData.address,
+  city: formData.city,
+  state: formData.state,
+  pin: formData.pin,
+  phone: formData.phone,
 });
+
 
           dispatch(clearCart());
           localStorage.removeItem("cart");
