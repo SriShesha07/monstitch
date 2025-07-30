@@ -2,10 +2,10 @@ import Razorpay from "razorpay";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
-// Parse Firebase service account JSON and log basic structure
+// Parse Firebase service account JSON
 let serviceAccount;
 try {
-  console.log(  "🔍 Parsing FIREBASE_SERVICE_ACCOUNT_JSON");
+  console.log("🔍 Parsing FIREBASE_SERVICE_ACCOUNT_JSON");
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
   console.log("✅ Firebase service account loaded");
 } catch (error) {
@@ -43,28 +43,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch product details
     let totalAmount = 0;
+    const shippingCharge = 20;
+
     for (const item of cartItems) {
       console.log(`🔍 Fetching product ID: ${item.productId}`);
       const productsRef = db.collection("products");
-const querySnapshot = await productsRef.where("productId", "==", item.productId).get();
+      const querySnapshot = await productsRef.where("productId", "==", item.productId).get();
 
       if (querySnapshot.empty) {
         console.error(`❌ Product not found: ${item.productId}`);
         return res.status(404).json({ error: `Product not found: ${item.productId}` });
       }
 
-      const productData = querySnapshot.docs[0].data()
+      const productData = querySnapshot.docs[0].data();
       console.log(`✅ Product found: ${item.productId}`, productData);
       const price = productData.price;
       const itemTotal = price * item.quantity;
       totalAmount += itemTotal;
 
-      console.log(`✅ Product: ${item.productId}, Qty: ${item.quantity}, Price: ₹${price}, Subtotal: ₹${itemTotal}`);
+      console.log(`🧾 Product: ${item.productId}, Qty: ${item.quantity}, Price: ₹${price}, Subtotal: ₹${itemTotal}`);
     }
 
-    console.log("💰 Total order amount:", totalAmount);
+    totalAmount += shippingCharge;
+    console.log(`🚚 Shipping Charge: ₹${shippingCharge}`);
+    console.log(`💰 Final Total (with shipping): ₹${totalAmount}`);
 
     // Razorpay instance
     const razorpay = new Razorpay({
