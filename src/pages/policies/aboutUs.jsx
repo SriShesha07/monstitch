@@ -91,7 +91,8 @@ const AboutUs = () => {
           <h2 className="text-2xl font-semibold mb-3">Contact & Socials</h2>
           <p className="text-gray-300 mb-2">📞 <strong>Phone:</strong> 9499961707</p>
           <p className="text-gray-300 mb-2">📧 <strong>Email:</strong> monstitchclothing@gmail.com</p>
-          <p className="text-gray-300">📸 <strong>Instagram:</strong> <a href="https://instagram.com/monstitch.clothing" className="underline">monstitch.clothing</a></p>
+          <p className="text-gray-300">📸 <strong>Instagram:</strong> <a href="https://instagram.com/monstitch.clothing" className="underline"  target="_blank"
+    rel="noopener noreferrer">monstitch.clothing</a></p>
         </section>
 
         {/* Founder’s Note */}

@@ -91,7 +91,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    const amount = total;
+    const amount = total + 20; // Adding shipping cost
     const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
 
     let order;
@@ -174,12 +174,13 @@ const CheckoutPage = () => {
             state: formData.state,
             pin: formData.pin,
             phone: formData.phone,
+            totalPaid: amount,
             cartItems: cartItems.map((item) => ({
               name: item.name || "",
               size: item.size || "",
               quantity: item.quantity,
               price: item.price,
-              amount,
+              
             })),
             status: "Ordered",
           });

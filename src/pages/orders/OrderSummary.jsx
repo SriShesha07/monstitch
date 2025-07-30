@@ -33,6 +33,14 @@ const OrderSummary = () => {
     cartItems,
   } = orderDetails;
 
+  // Calculate subtotal (excluding shipping)
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const shipping = 20;
+  const total = subtotal + shipping;
+
   return (
     <Layout>
       <div className="max-w-6xl mx-auto px-4 py-10 text-white">
@@ -51,7 +59,9 @@ const OrderSummary = () => {
             <h2 className="text-xl font-semibold mb-4 text-white">Order Details</h2>
             <div className="space-y-2 text-gray-300">
               <p><span className="font-medium text-white">Order ID:</span> {order_id}</p>
-              <p><span className="font-medium text-white">Paid:</span> ₹{amount}</p>
+              <p><span className="font-medium text-white">Subtotal:</span> ₹{subtotal.toFixed(2)}</p>
+              <p><span className="font-medium text-white">Shipping:</span> ₹{shipping.toFixed(2)}</p>
+              <p><span className="font-medium text-white">Total Paid:</span> ₹{total.toFixed(2)}</p>
               <p><span className="font-medium text-white">Date:</span> {new Date(createdAt).toLocaleString()}</p>
             </div>
           </div>
@@ -93,7 +103,7 @@ const OrderSummary = () => {
                   <p className="text-gray-400">Quantity: {item.quantity}</p>
                   <p className="text-gray-400">Price: ₹{item.price}</p>
                   <p className="text-gray-400">
-                    Subtotal: ₹{item.price * item.quantity}
+                    Subtotal: ₹{(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
               </div>

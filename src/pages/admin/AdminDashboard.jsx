@@ -16,27 +16,27 @@ const AdminDashboard = () => {
 
         {/* Tab Area */}
         <div className="border border-white p-5 rounded-lg">
-          <Tabs>
+          <Tabs defaultIndex={0}>
             {/* Tab Buttons */}
             <TabList className="flex justify-center gap-10 mb-10">
               <Tab className="border border-white px-10 py-4 rounded-md text-lg font-semibold cursor-pointer hover:bg-white hover:text-black transition">
-                Products
+                Orders
               </Tab>
               <Tab className="border border-white px-10 py-4 rounded-md text-lg font-semibold cursor-pointer hover:bg-white hover:text-black transition">
-                Orders
+                Products
               </Tab>
             </TabList>
 
             {/* Tab Contents */}
             <TabPanel>
               <div className="border border-white p-10 rounded-lg">
-                <ProductDetail />
+                <OrderDetail />
               </div>
             </TabPanel>
 
             <TabPanel>
               <div className="border border-white p-10 rounded-lg">
-                <OrderDetail />
+                <ProductDetail />
               </div>
             </TabPanel>
           </Tabs>

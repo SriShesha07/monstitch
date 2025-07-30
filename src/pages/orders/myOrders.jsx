@@ -3,7 +3,6 @@ import { getAuth } from "firebase/auth";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { fireDB } from "../../firebase/FirebaseConfig";
 import Layout from "../../componentss/layout/Layout";
-import { Link } from "react-router-dom";
 
 const OrdersPerPage = 5;
 
@@ -20,13 +19,11 @@ const MyOrders = () => {
     lastName: "",
   });
 
-  // Extract user info from Google Auth
   useEffect(() => {
     if (user) {
       const fullName = user.displayName || "";
       const [firstName, ...rest] = fullName.split(" ");
       const lastName = rest.join(" ");
-
       setUserInfo({
         email: user.email || "",
         firstName: firstName || "",
@@ -77,7 +74,6 @@ const MyOrders = () => {
       <div className="min-h-screen bg-black text-white px-4 md:px-20 py-6">
         <h1 className="text-2xl font-bold mb-6 text-center">My Orders</h1>
 
-        {/* ✅ Logged-in User Info */}
         <div className="bg-zinc-900 border border-gray-700 rounded-lg p-5 mb-6 shadow">
           <h2 className="font-semibold text-lg mb-2">Account Info</h2>
           <p className="text-sm">
@@ -96,71 +92,91 @@ const MyOrders = () => {
               It looks like you haven't placed any orders yet. Start exploring
               our collection and treat yourself to something amazing!
             </p>
-            {/* Optional: Uncomment if you want a shop button */}
-            {/* <Link to="/" className="w-full py-3 border border-white rounded-full font-semibold hover:bg-white hover:text-black transition">Shop Now</Link> */}
           </div>
         ) : (
-          currentOrders.map((order) => (
-            <div
-              key={order.id}
-              className="border border-white rounded-lg p-5 mb-6 shadow-md"
-            >
-              <h2 className="font-semibold text-lg mb-2">
-                Order ID: {order.order_id}
-              </h2>
-              <p className="text-sm mb-1">
-                Status: <span className="font-semibold">{order.status}</span>
-              </p>
-              <p className="text-sm mb-2">
-                Ordered On:{" "}
-                {new Date(order.createdAt.toDate()).toLocaleString()}
-              </p>
+          currentOrders.map((order) => {
+            const shippingCharge = 20;
+            const subtotal = order.cartItems.reduce(
+              (acc, item) => acc + item.price * item.quantity,
+              0
+            );
+            const totalPaid = subtotal + shippingCharge;
 
-              <div className="mt-4 text-sm text-gray-300 space-y-1">
-                <p>
-                  <span className="font-semibold text-white">Name:</span>{" "}
-                  {order.firstName} {order.lastName}
+            return (
+              <div
+                key={order.id}
+                className="border border-white rounded-lg p-5 mb-6 shadow-md"
+              >
+                <h2 className="font-semibold text-lg mb-2">
+                  Order ID: {order.order_id}
+                </h2>
+                <p className="text-sm mb-1">
+                  Status: <span className="font-semibold">{order.status}</span>
                 </p>
-                <p>
-                  <span className="font-semibold text-white">Phone:</span>{" "}
-                  {order.phone}
+                <p className="text-sm mb-1">
+                  Ordered On:{" "}
+                  {new Date(order.createdAt.toDate()).toLocaleString()}
                 </p>
-                <p>
-                  <span className="font-semibold text-white">Email:</span>{" "}
-                  {order.email}
+                <p className="text-sm">
+                  Subtotal: <span className="font-semibold">₹{subtotal}</span>
                 </p>
-                <p>
-                  <span className="font-semibold text-white">Address:</span>{" "}
-                  {order.apartment ? `${order.apartment}, ` : ""}
-                  {order.address}, {order.city}, {order.state} - {order.pin}
+                <p className="text-sm">
+                  Shipping: <span className="font-semibold">₹{shippingCharge}</span>
                 </p>
-              </div>
+                <p className="text-sm mb-2">
+                  Total Paid: <span className="font-bold text-green-400">₹{order.totalPaid}</span>
+                </p>
 
-              {/* Ordered Items */}
-              <div className="grid md:grid-cols-2 gap-4 mt-5">
-                {order.cartItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-4 border border-gray-700 p-3 rounded-lg"
-                  >
-                    <img
-                      src={
-                        products[item.name] || "https://via.placeholder.com/80"
-                      }
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded"
-                    />
-                    <div>
-                      <p className="font-semibold">{item.name}</p>
-                      <p className="text-sm">Size: {item.size}</p>
-                      <p className="text-sm">Qty: {item.quantity}</p>
-                      <p className="text-sm">Price: ₹{item.price}</p>
+                <div className="mt-4 text-sm text-gray-300 space-y-1">
+                  <p>
+                    <span className="font-semibold text-white">Name:</span>{" "}
+                    {order.firstName} {order.lastName}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-white">Phone:</span>{" "}
+                    {order.phone}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-white">Email:</span>{" "}
+                    {order.email}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-white">Address:</span>{" "}
+                    {order.apartment ? `${order.apartment}, ` : ""}
+                    {order.address}, {order.city}, {order.state} - {order.pin}
+                  </p>
+                </div>
+
+                {/* Ordered Items */}
+                <div className="grid md:grid-cols-2 gap-4 mt-5">
+                  {order.cartItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-4 border border-gray-700 p-3 rounded-lg"
+                    >
+                      <img
+                        src={
+                          products[item.name] ||
+                          "https://via.placeholder.com/80"
+                        }
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                      <div>
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm">Size: {item.size}</p>
+                        <p className="text-sm">Qty: {item.quantity}</p>
+                        <p className="text-sm">Price: ₹{item.price}</p>
+                        <p className="text-sm">
+                          Subtotal: ₹{item.price * item.quantity}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
 
         {/* Pagination */}
