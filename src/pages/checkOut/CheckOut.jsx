@@ -1,23 +1,24 @@
-import React, { useState } from "react";
+// 🧾 CheckoutPage.jsx
+
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import CheckoutSummary from "../checkOut/CheckoutSummary";
-import Layout from "../../componentss/layout/Layout";
-import { addDoc, collection } from "firebase/firestore";
-import { fireDB } from "../../firebase/FirebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth/cordova";
-import { useEffect } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { fireDB } from "../../firebase/FirebaseConfig";
 import toast from "react-hot-toast";
 import { clearCart } from "../../redux/cartSlice";
+import Layout from "../../componentss/layout/Layout";
+import CheckoutSummary from "../checkOut/CheckoutSummary";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
+  const cartItems = useSelector((state) => state.cart);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
@@ -29,33 +30,28 @@ const CheckoutPage = () => {
     pin: "",
     phone: "",
   });
-
   const [errors, setErrors] = useState({});
 
-  const cartItems = useSelector((state) => state.cart);
   const total = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user?.email) {
-      handleChange("email", user.email);
-    }
+    if (user?.email) handleChange("email", user.email);
   }, []);
 
-  const loadScript = () =>
-    new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  const inputClass = (field) =>
+    `w-full p-3 bg-[#121212] border rounded mb-1 ${
+      errors[field] ? "border-red-500" : "border-gray-700"
+    }`;
 
   const validateForm = () => {
-    const newErrors = {};
     const requiredFields = [
       "email",
       "firstName",
@@ -66,12 +62,11 @@ const CheckoutPage = () => {
       "pin",
       "phone",
     ];
+    const newErrors = {};
 
     requiredFields.forEach((field) => {
       if (!formData[field].trim()) {
-        newErrors[field] = `${
-          field[0].toUpperCase() + field.slice(1)
-        } is required`;
+        newErrors[field] = `${field[0].toUpperCase() + field.slice(1)} is required`;
       }
     });
 
@@ -79,10 +74,18 @@ const CheckoutPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const loadScript = () =>
+    new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
   const handlePayment = async () => {
     if (!validateForm()) return;
-
-    setIsLoading(true); // Start loader
+    setIsLoading(true);
 
     const sdkLoaded = await loadScript();
     if (!sdkLoaded) {
@@ -91,12 +94,12 @@ const CheckoutPage = () => {
       return;
     }
 
-    const amount = total + 20; // Adding shipping cost
+    const amount = total + 20;
     const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
 
     let order;
     try {
-      const orderRes = await fetch("/api/createOrder", {
+      const res = await fetch("/api/createOrder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,19 +111,10 @@ const CheckoutPage = () => {
         }),
       });
 
-      if (!orderRes.ok) {
-        throw new Error(`HTTP ${orderRes.status} - ${orderRes.statusText}`);
-      }
-
-      order = await orderRes.json();
-
-      // ✅ Validate order object
-      if (!order || !order.id || !order.amount || !order.currency) {
-        throw new Error("Invalid order response from server.");
-      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      order = await res.json();
     } catch (err) {
-      console.error("❌ Order creation failed:", err);
-      toast.error("Unable to create order. Please try again.");
+      toast.error("Unable to create order.");
       setIsLoading(false);
       return;
     }
@@ -133,20 +127,16 @@ const CheckoutPage = () => {
       description: "Order Payment",
       order_id: order.id,
       handler: async (response) => {
-        setIsLoading(true);
-
         try {
-          const verifyRes = await fetch("/api/verifyPayment", {
+          const verify = await fetch("/api/verifyPayment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response),
           });
 
-          const { valid } = await verifyRes.json();
+          const { valid } = await verify.json();
+          if (!valid) throw new Error("Invalid payment verification");
 
-          if (!valid) throw new Error("Payment verification failed");
-
-          // Save payment to Firestore
           await addDoc(collection(fireDB, "payments"), {
             order_id: response.razorpay_order_id,
             payment_id: response.razorpay_payment_id,
@@ -154,16 +144,15 @@ const CheckoutPage = () => {
             status: "success",
             amount,
             createdAt: new Date(),
-            uid: user?.uid || "",
-            email: user?.email || "",
-            name: user?.displayName || "",
-            phone: formData.phone || "",
+            uid: user?.uid,
+            email: user?.email,
+            name: user?.displayName,
+            phone: formData.phone,
           });
 
-          // Save order to Firestore
           await addDoc(collection(fireDB, "orders"), {
             order_id: response.razorpay_order_id,
-            uid: user?.uid || "",
+            uid: user?.uid,
             createdAt: new Date(),
             email: formData.email,
             firstName: formData.firstName,
@@ -176,119 +165,31 @@ const CheckoutPage = () => {
             phone: formData.phone,
             totalPaid: amount,
             cartItems: cartItems.map((item) => ({
-              name: item.name || "",
-              size: item.size || "",
+              name: item.name,
+              size: item.size,
               quantity: item.quantity,
               price: item.price,
-              
             })),
             status: "Ordered",
           });
 
-          // Optional: Send confirmation email...
-          // Add this function inside your CheckoutPage component (before the return statement)
-          const sendConfirmationEmail = async (orderDetails) => {
-  const {
-    email,
-    firstName,
-    lastName,
-    cartItems,
-    amount,
-    order_id,
-    address,
-    city,
-    state,
-    pin,
-    phone,
-  } = orderDetails;
-
-  const html = `
-    <div style="background-color:#0d0d0d;padding:30px;font-family:sans-serif;color:#fff;">
-      <div style="max-width:600px;margin:auto;background-color:#1a1a1a;padding:30px;border-radius:8px;border:1px solid #333;">
-        <h2 style="color:#fff;margin-top:0;">Hi ${firstName} ${lastName},</h2>
-        <p style="color:#ccc;">
-          Thank you for shopping with <span style="color:orange;font-weight:bold;">Monstitch</span>! Your order has been placed successfully. Here are your order details:
-        </p>
-
-        <hr style="border:1px solid #333;margin:20px 0;">
-
-        <p><strong>Order ID:</strong> ${order_id}</p>
-
-        <h3 style="margin-bottom:10px;">Items Ordered:</h3>
-
-        ${cartItems
-          .map(
-            (item) => `
-          <div style="display:flex;align-items:center;margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;">
-            <img src="${item.ImageUrl2}" alt="${item.name}" width="60" height="60" style="border-radius:4px;margin-right:15px;">
-            <div style="flex:1;">
-              <p style="margin:0;color:#fff;font-weight:600;">${item.name}</p>
-              <p style="margin:0;font-size:14px;color:#aaa;">Size: ${item.size}</p>
-              <p style="margin:0;font-size:14px;color:#aaa;">Qty: ${item.quantity}</p>
-            </div>
-            <div style="color:#fff;font-weight:500;">₹${item.price}</div>
-          </div>
-        `
-          )
-          .join("")}
-
-        <hr style="border:1px solid #333;margin:20px 0;">
-
-        <p><strong>Total Amount:</strong> ₹${(amount).toFixed(2)}</p>
-
-        <hr style="border:1px solid #333;margin:20px 0;">
-
-        <h3>Shipping Address:</h3>
-        <p style="color:#ccc;line-height:1.6;">
-          ${address}<br />
-          ${city}, ${state} - ${pin}<br />
-          <strong>Phone:</strong> ${phone}
-        </p>
-
-        <hr style="border:1px solid #333;margin:20px 0;">
-
-        <p style="color:#bbb;">Cheers,<br />
-        <span style="color:orange;font-weight:bold;">– Monstitch Team</span></p>
-      </div>
-    </div>
-  `;
-
-  try {
-    await fetch("/api/sendEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: email,
-        subject: "Order Confirmation - Monstitch",
-        html,
-      }),
-    });
-  } catch (error) {
-    console.error("Failed to send confirmation email:", error);
-  }
-};
-
-await sendConfirmationEmail({
-  email: formData.email,
-  firstName: formData.firstName,
-  lastName: formData.lastName,
-  cartItems,
-  amount,
-  order_id: response.razorpay_order_id,
-  address: formData.address,
-  city: formData.city,
-  state: formData.state,
-  pin: formData.pin,
-  phone: formData.phone,
-});
-
+          await sendConfirmationEmail({
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            cartItems,
+            amount,
+            order_id: response.razorpay_order_id,
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            pin: formData.pin,
+            phone: formData.phone,
+          });
 
           dispatch(clearCart());
           localStorage.removeItem("cart");
-
           toast.success("Order placed successfully!");
-          setIsLoading(false);
-
           navigate("/orderSummary", {
             state: {
               orderDetails: {
@@ -306,33 +207,61 @@ await sendConfirmationEmail({
             },
           });
         } catch (err) {
-          console.error("❌ Payment processing failed:", err);
-          toast.error("Payment failed. Please try again.");
+          toast.error("Payment failed. Try again.");
+        } finally {
           setIsLoading(false);
         }
       },
       modal: {
         ondismiss: () => {
           toast("Payment popup closed.");
-          setIsLoading(false); // ✅ Important: Stop loader when popup is closed
+          setIsLoading(false);
         },
       },
-      theme: { color: "#3399cc" },
+      method: {
+        upi: true,
+        card: true,
+        netbanking: true,
+        wallet: true,
+        emi: false,
+        paylater: false,
+      },
+      theme: {
+        mode: "dark",
+        color: "#121212",
+      },
     };
 
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
+  const sendConfirmationEmail = async (orderDetails) => {
+    const {
+      email,
+      firstName,
+      lastName,
+      cartItems,
+      amount,
+      order_id,
+      address,
+      city,
+      state,
+      pin,
+      phone,
+    } = orderDetails;
 
-  const inputClass = (field) =>
-    `w-full p-3 bg-[#121212] border rounded mb-1 ${
-      errors[field] ? "border-red-500" : "border-gray-700"
-    }`;
+    const html = `<div style="background:#0d0d0d;padding:30px;color:#fff;"><h2>Hello ${firstName},</h2><p>Your order <b>${order_id}</b> is confirmed.</p></div>`;
+    try {
+      await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: email, subject: "Order Confirmation", html }),
+      });
+    } catch (error) {
+      console.error("Email send failed:", error);
+    }
+  };
 
   return (
     <Layout>
