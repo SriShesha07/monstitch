@@ -57,7 +57,7 @@ const OrderDetail = () => {
 
       <hr style="border:1px solid #333;margin:20px 0;">
 
-      <p><strong>Total Amount:</strong> ₹${(amount + 20).toFixed(2)} (including ₹20 shipping)</p>
+      <p><strong>Total Amount:</strong> ₹${(totalPaid).toFixed(2)} (including ₹20 shipping)</p>
 
       <hr style="border:1px solid #333;margin:20px 0;">
 
