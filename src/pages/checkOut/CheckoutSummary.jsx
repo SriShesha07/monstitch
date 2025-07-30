@@ -1,18 +1,18 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-
-
 const CheckoutSummary = () => {
-
-    
   const cartItems = useSelector((state) => state.cart);
+
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
+  const shipping = 20;
+  const total = subtotal + shipping;
+
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
- 
+
   return (
     <div className="bg-black text-white p-6 rounded-lg w-full max-w-md">
       {/* Cart Items */}
@@ -40,20 +40,6 @@ const CheckoutSummary = () => {
         ))}
       </div>
 
-      {/* Discount */}
-      {/* <div className="mt-6">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Discount code"
-            className="flex-1 px-3 py-2 text-sm text-white bg-black border border-gray-600 rounded-md placeholder:text-gray-400"
-          />
-          <button className="bg-gray-800 text-sm px-4 py-2 rounded-md hover:bg-white hover:text-black transition">
-            Apply
-          </button>
-        </div>
-      </div> */}
-
       {/* Totals */}
       <div className="mt-6 border-t border-gray-700 pt-4 space-y-2 text-sm">
         <div className="flex justify-between">
@@ -62,7 +48,7 @@ const CheckoutSummary = () => {
         </div>
         <div className="flex justify-between">
           <span>Shipping</span>
-          <span className="text-green-500">FREE</span>
+          <span className="text-white">₹{shipping.toFixed(2)}</span>
         </div>
       </div>
 
@@ -70,7 +56,7 @@ const CheckoutSummary = () => {
       <div className="mt-4 flex justify-between items-center text-lg font-bold">
         <span>Total</span>
         <span className="text-xl">
-          INR ₹{subtotal.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+          INR ₹{total.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
         </span>
       </div>
     </div>

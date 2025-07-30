@@ -8,6 +8,8 @@ import toast from 'react-hot-toast';
 function MyState({ children }) {
     // Loading State 
     const [loading, setLoading] = useState(false);
+    const [showSizeChart, setShowSizeChart] = useState(false);
+
 
     // User State
     const [getAllProduct, setGetAllProduct] = useState([]);

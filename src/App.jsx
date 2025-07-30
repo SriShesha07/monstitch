@@ -46,6 +46,7 @@ export default function App() {
               </ProtectedRouteForUser>
             }
           />
+          
           {/* <Route path="/allproduct" element={<AllProduct />} /> */}
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
@@ -84,6 +85,7 @@ export default function App() {
               <ProtectedRouteForAdmin>
                 <AddProductPage />
               </ProtectedRouteForAdmin>
+              
             }
           />
           <Route

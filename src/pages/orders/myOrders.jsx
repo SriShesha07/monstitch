@@ -10,11 +10,31 @@ const OrdersPerPage = 5;
 const MyOrders = () => {
   const auth = getAuth();
   const user = auth.currentUser;
+
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
+  });
 
-  // Fetch products with image URLs
+  // Extract user info from Google Auth
+  useEffect(() => {
+    if (user) {
+      const fullName = user.displayName || "";
+      const [firstName, ...rest] = fullName.split(" ");
+      const lastName = rest.join(" ");
+
+      setUserInfo({
+        email: user.email || "",
+        firstName: firstName || "",
+        lastName: lastName || "",
+      });
+    }
+  }, [user]);
+
   const fetchProducts = async () => {
     const snapshot = await getDocs(collection(fireDB, "products"));
     const productMap = {};
@@ -46,12 +66,10 @@ const MyOrders = () => {
     fetchOrders();
   }, [user]);
 
-  // Pagination logic
   const indexOfLastOrder = currentPage * OrdersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - OrdersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
   const totalPages = Math.ceil(orders.length / OrdersPerPage);
-
   const changePage = (page) => setCurrentPage(page);
 
   return (
@@ -59,20 +77,27 @@ const MyOrders = () => {
       <div className="min-h-screen bg-black text-white px-4 md:px-20 py-6">
         <h1 className="text-2xl font-bold mb-6 text-center">My Orders</h1>
 
+        {/* ✅ Logged-in User Info */}
+        <div className="bg-zinc-900 border border-gray-700 rounded-lg p-5 mb-6 shadow">
+          <h2 className="font-semibold text-lg mb-2">Account Info</h2>
+          <p className="text-sm">
+            <span className="font-semibold text-white">Name:</span>{" "}
+            {userInfo.firstName} {userInfo.lastName}
+          </p>
+          <p className="text-sm">
+            <span className="font-semibold text-white">Email:</span>{" "}
+            {userInfo.email}
+          </p>
+        </div>
+
         {orders.length === 0 ? (
           <div className="text-center text-lg text-gray-400 mt-10">
             <p className="mb-4">
               It looks like you haven't placed any orders yet. Start exploring
               our collection and treat yourself to something amazing!
             </p>
-            {/* <div className="space-y-4 mb-6">
-              <Link
-                to="/"
-                className="w-full py-3 border border-white rounded-full font-semibold hover:bg-white hover:text-black transition"
-              >
-                Shop Now
-              </Link>
-            </div> */}
+            {/* Optional: Uncomment if you want a shop button */}
+            {/* <Link to="/" className="w-full py-3 border border-white rounded-full font-semibold hover:bg-white hover:text-black transition">Shop Now</Link> */}
           </div>
         ) : (
           currentOrders.map((order) => (
@@ -91,7 +116,6 @@ const MyOrders = () => {
                 {new Date(order.createdAt.toDate()).toLocaleString()}
               </p>
 
-              {/* Shipping Info */}
               <div className="mt-4 text-sm text-gray-300 space-y-1">
                 <p>
                   <span className="font-semibold text-white">Name:</span>{" "}
@@ -112,7 +136,7 @@ const MyOrders = () => {
                 </p>
               </div>
 
-              {/* Items */}
+              {/* Ordered Items */}
               <div className="grid md:grid-cols-2 gap-4 mt-5">
                 {order.cartItems.map((item, index) => (
                   <div

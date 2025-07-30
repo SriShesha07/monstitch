@@ -46,7 +46,7 @@ const CartPage = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold">Your cart</h1>
             <Link
-              to="/allproduct"
+              to="/"
               className="text-sm text-gray-300 hover:text-white underline"
             >
               Continue shopping
