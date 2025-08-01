@@ -5,11 +5,23 @@ const HeroSection = () => {
   const [signedUrl, setSignedUrl] = useState("");
 
   // Function to extract publicId from Cloudinary URL
-  const extractPublicId = (url) => {
-    const parts = url.split("/upload/");
-    if (parts.length < 2) return null;
-    return parts[1].replace(/\.[^/.]+$/, ""); // removes file extension
-  };
+ const extractPublicId = (url) => {
+  try {
+    const urlObj = new URL(url);
+    const pathSegments = urlObj.pathname.split('/');
+
+    // Find the version segment (starts with "v" followed by digits)
+    const versionIndex = pathSegments.findIndex((seg) => /^v\d+$/.test(seg));
+    if (versionIndex === -1 || versionIndex === pathSegments.length - 1) return null;
+
+    // public_id is everything after the version, joined back with '/'
+    const publicIdWithExt = pathSegments.slice(versionIndex + 1).join('/');
+    return publicIdWithExt.replace(/\.[^/.]+$/, ''); // Remove extension
+  } catch (err) {
+    console.error("Invalid URL passed to extractPublicId:", err);
+    return null;
+  }
+};
 
   useEffect(() => {
     const fetchSignedUrl = async () => {
