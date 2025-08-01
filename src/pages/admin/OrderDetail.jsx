@@ -16,7 +16,7 @@ const OrderDetail = () => {
   const closeModal = () => setSelectedOrder(null);
 
   const markAsShipped = async (order) => {
-    const { id, email, firstName, lastName, order_id, cartItems, totalPaid } =
+    const { id, email, firstName, lastName, order_id, cartItems, totalPaid, address, city, state, pin, phone, apartment  } =
       order;
 
     try {

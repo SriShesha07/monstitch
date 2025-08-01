@@ -182,6 +182,7 @@ const CheckoutPage = () => {
             order_id: response.razorpay_order_id,
             address: formData.address,
             city: formData.city,
+            apartment : formData.apartment,
             state: formData.state,
             pin: formData.pin,
             phone: formData.phone,

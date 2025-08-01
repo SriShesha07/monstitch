@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import myContext from "../../context/myContext";
 import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
 import { addToCart, deleteFromCart } from "../../redux/cartSlice";
 import ProductModal from "../productModal/ProductModal";
+import toast from "react-hot-toast";
 
 const HomePageProductCard = () => {
   const navigate = useNavigate();
@@ -12,11 +12,41 @@ const HomePageProductCard = () => {
   const { getAllProduct } = context;
   const cartItems = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const [signedUrls, setSignedUrls] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
+
+  useEffect(() => {
+    const fetchSignedUrls = async () => {
+      const urls = {};
+      for (const product of getAllProduct) {
+        const publicId = extractPublicId(product.ImageUrl2);
+        try {
+          const res = await fetch("/api/getSignedImageUrl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ publicId }),
+          });
+          const data = await res.json();
+          urls[product.id] = data.url;
+        } catch (err) {
+          console.error("Failed to fetch signed URL:", err);
+        }
+      }
+      setSignedUrls(urls);
+    };
+
+    if (getAllProduct.length > 0) fetchSignedUrls();
+  }, [getAllProduct]);
+
+  const extractPublicId = (url) => {
+    const parts = url.split("/upload/");
+    if (parts.length < 2) return null;
+    return parts[1].replace(/\.[^/.]+$/, ""); // remove extension
+  };
 
   return (
     <div className="mt-10 bg-black py-8">
@@ -30,12 +60,10 @@ const HomePageProductCard = () => {
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...getAllProduct]
-              .sort((a, b) => {
-                // Ensure numeric sorting even if productId is a string
-                return parseInt(a.productId) - parseInt(b.productId);
-              })
+              .sort((a, b) => parseInt(a.productId) - parseInt(b.productId))
               .map((item, idx) => {
-                const { id, name, price, ImageUrl2 } = item;
+                const { id, name, price } = item;
+                const imageUrl = signedUrls[id];
 
                 return (
                   <div
@@ -43,12 +71,16 @@ const HomePageProductCard = () => {
                     className="group overflow-hidden bg-black rounded-xl shadow-lg border border-gray-700 flex flex-col justify-between"
                   >
                     <div className="relative overflow-hidden rounded-t-xl">
-                      <img
-                        onClick={() => navigate(`/productinfo/${id}`)}
-                        src={ImageUrl2}
-                        alt={name}
-                        className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500 cursor-pointer"
-                      />
+                      {imageUrl ? (
+                        <img
+                          onClick={() => navigate(`/productinfo/${id}`)}
+                          src={imageUrl}
+                          alt={name}
+                          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500 cursor-pointer"
+                        />
+                      ) : (
+                        <div className="w-full h-80 bg-gray-800 animate-pulse"></div>
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-30 pointer-events-none"></div>
                     </div>
 
@@ -60,14 +92,6 @@ const HomePageProductCard = () => {
                         ₹{price}
                       </p>
                     </div>
-
-                    {/* Optional modal trigger */}
-                    {/* <button
-                      onClick={() => setSelectedProduct(item)}
-                      className="w-full py-3 border-t border-gray-700 text-white text-sm font-bold tracking-wider rounded-b-xl transition duration-300 hover:bg-white hover:text-black"
-                    >
-                      Choose Options
-                    </button> */}
                   </div>
                 );
               })}
@@ -75,7 +99,6 @@ const HomePageProductCard = () => {
         </div>
       </section>
 
-      {/* Product Modal */}
       <ProductModal
         isOpen={selectedProduct !== null}
         onClose={() => setSelectedProduct(null)}
