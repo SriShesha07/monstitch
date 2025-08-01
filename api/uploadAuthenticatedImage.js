@@ -1,7 +1,7 @@
 // /api/uploadAuthenticatedImage.js
-import { IncomingForm } from 'formidable';
+
 import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
+import formidable from 'formidable';
 
 // Disable Vercel's default body parser
 export const config = {
@@ -10,7 +10,7 @@ export const config = {
   },
 };
 
-// Cloudinary config
+// Cloudinary credentials
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -19,32 +19,32 @@ cloudinary.config({
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Only POST allowed' });
+    return res.status(405).json({ error: 'Only POST method allowed' });
   }
 
-  console.log('[API] Starting upload handler');
+  const form = new formidable.IncomingForm({ keepExtensions: true });
 
-  const form = new IncomingForm({ keepExtensions: true });
-
+  console.log('[API] Parsing form data...');
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('[API] Form parsing error:', err);
-      return res.status(500).json({ error: 'Form parsing error', details: err.message });
+      console.error('[API] Form parse error:', err);
+      return res.status(500).json({ error: 'Form parse error', details: err.message });
     }
 
-    const file = files.file;
+    const file = Array.isArray(files.file) ? files.file[0] : files.file;
     const publicId = fields.public_id || `secure_uploads/${Date.now()}`;
 
     if (!file) {
+      console.error('[API] No file uploaded.');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    console.log('[API] Uploading file:', file.originalFilename);
+    console.log('[API] Uploading file to Cloudinary with public_id:', publicId);
 
     try {
       const result = await cloudinary.uploader.upload(file.filepath, {
         public_id: publicId,
-        type: 'authenticated', // crucial for private assets
+        type: 'authenticated', // Private delivery
         folder: 'secure_uploads',
       });
 
