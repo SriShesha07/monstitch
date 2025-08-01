@@ -1,7 +1,6 @@
 // /api/getSignedImageUrl.js
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary with environment variables
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -25,20 +24,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const expiresAt = Math.floor(Date.now() / 1000) + 3600; // expires in 1 hour
+    const expiresAt = Math.floor(Date.now() / 1000) + 3600; // 1 hour
     console.log('[API] Generating signed URL with expiry:', expiresAt);
 
     const signedUrl = cloudinary.url(publicId, {
       type: 'authenticated',
+      resource_type: 'image', // <-- important!
       sign_url: true,
       secure: true,
       expires_at: expiresAt,
     });
 
     console.log('[API] Signed URL generated successfully:', signedUrl);
-    res.status(200).json({ url: signedUrl });
+    return res.status(200).json({ url: signedUrl });
   } catch (err) {
     console.error('[API] Error generating signed URL:', err);
-    res.status(500).json({ message: 'Failed to sign URL', error: err.message });
+    return res.status(500).json({ message: 'Failed to sign URL', error: err.message });
   }
 }
