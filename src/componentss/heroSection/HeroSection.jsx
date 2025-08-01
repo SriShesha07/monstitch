@@ -25,7 +25,8 @@ const HeroSection = () => {
 
   useEffect(() => {
     const fetchSignedUrl = async () => {
-      const publicId = extractPublicId(originalImageUrl);
+      // const publicId = extractPublicId(originalImageUrl);
+      const publicId = 1754014604151;
       if (!publicId) {
         console.error("Failed to extract publicId from URL");
         return;
