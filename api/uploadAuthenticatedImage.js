@@ -1,16 +1,12 @@
-// /api/uploadAuthenticatedImage.js
-
 import { v2 as cloudinary } from 'cloudinary';
 import formidable from 'formidable';
 
-// Disable Vercel's default body parser
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-// Cloudinary credentials
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -22,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Only POST method allowed' });
   }
 
-  const form = new formidable.IncomingForm({ keepExtensions: true });
+  const form = formidable({ keepExtensions: true }); // ✅ fixed
 
   console.log('[API] Parsing form data...');
   form.parse(req, async (err, fields, files) => {
@@ -39,12 +35,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    console.log('[API] Uploading file to Cloudinary with public_id:', publicId);
+    console.log('[API] Uploading to Cloudinary →', publicId);
 
     try {
       const result = await cloudinary.uploader.upload(file.filepath, {
         public_id: publicId,
-        type: 'authenticated', // Private delivery
+        type: 'authenticated',
         folder: 'secure_uploads',
       });
 
