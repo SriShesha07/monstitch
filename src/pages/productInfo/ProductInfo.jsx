@@ -74,7 +74,18 @@ const ProductInfo = () => {
           {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[product.ImageUrl1, product.ImageUrl2].map((img, i) => (
+              {/* {[product.ImageUrl1, product.ImageUrl2].map((img, i) => (
+                <Zoom key={i}>
+                  <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
+                    <img
+                      src={img}
+                      alt={`Product ${i + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                </Zoom>
+              ))} */}
+              {product.Images?.map((img, i) => (
                 <Zoom key={i}>
                   <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
                     <img
@@ -88,7 +99,9 @@ const ProductInfo = () => {
             </div>
 
             {/* Related Products */}
-            <h2 className="text-xl font-semibold mt-4 text-white">You May Also Like</h2>
+            <h2 className="text-xl font-semibold mt-4 text-white">
+              You May Also Like
+            </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {relatedProducts.map((item) => (
                 <div
@@ -96,9 +109,15 @@ const ProductInfo = () => {
                   onClick={() => navigate(`/productinfo/${item.id}`)}
                   className="bg-zinc-900 rounded-xl overflow-hidden border border-gray-700 cursor-pointer hover:scale-105 transition"
                 >
-                  <img src={item.ImageUrl2} alt={item.name} className="w-full h-52 object-cover" />
+                  <img
+                    src={item.ImageUrl2}
+                    alt={item.name}
+                    className="w-full h-52 object-cover"
+                  />
                   <div className="p-3">
-                    <h3 className="text-white font-semibold text-sm truncate">{item.name}</h3>
+                    <h3 className="text-white font-semibold text-sm truncate">
+                      {item.name}
+                    </h3>
                     <p className="text-gray-400 text-sm">Rs. {item.price}</p>
                   </div>
                 </div>
@@ -143,11 +162,17 @@ const ProductInfo = () => {
               <div className="mb-6">
                 <h2 className="font-semibold mb-1">Quantity</h2>
                 <div className="flex items-center w-32 border rounded-full overflow-hidden bg-zinc-900">
-                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="px-4 py-2">
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="px-4 py-2"
+                  >
                     <Minus />
                   </button>
                   <span className="flex-1 text-center">{quantity}</span>
-                  <button onClick={() => setQuantity((q) => q + 1)} className="px-4 py-2">
+                  <button
+                    onClick={() => setQuantity((q) => q + 1)}
+                    className="px-4 py-2"
+                  >
                     <Plus />
                   </button>
                 </div>
@@ -177,10 +202,15 @@ const ProductInfo = () => {
               <div>
                 <h2 className="text-2xl font-bold mb-2">Description</h2>
                 <p className="text-gray-300 leading-relaxed">
-                  Introducing the <strong>MONSTITCH Acid Wash T-Shirt</strong> – where comfort meets raw street style.
-                  Crafted from 100% premium cotton, this T-shirt is soft, breathable, and built for everyday wear.
-                  <br /><br />
-                  The acid-wash finish gives each piece a unique, vintage-inspired look. Pair it with jeans, cargos, or joggers — it's a statement on its own.
+                  Introducing the <strong>MONSTITCH Acid Wash T-Shirt</strong> –
+                  where comfort meets raw street style. Crafted from 100%
+                  premium cotton, this T-shirt is soft, breathable, and built
+                  for everyday wear.
+                  <br />
+                  <br />
+                  The acid-wash finish gives each piece a unique,
+                  vintage-inspired look. Pair it with jeans, cargos, or joggers
+                  — it's a statement on its own.
                 </p>
               </div>
 
@@ -213,7 +243,10 @@ const ProductInfo = () => {
         {/* Size Chart Modal */}
         {showSizeChart && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
-            <div ref={modalRef} className="bg-zinc-900 border border-gray-700 rounded-lg max-w-3xl w-full p-6 overflow-y-auto max-h-[80vh] relative">
+            <div
+              ref={modalRef}
+              className="bg-zinc-900 border border-gray-700 rounded-lg max-w-3xl w-full p-6 overflow-y-auto max-h-[80vh] relative"
+            >
               <button
                 onClick={() => setShowSizeChart(false)}
                 className="absolute top-4 right-4 text-white hover:text-gray-300 text-xl"
@@ -234,13 +267,46 @@ const ProductInfo = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-700">
                     {[
-                      { size: "XS", chest: 40, length: 28, shoulder: 21, sleeve: 9 },
-                      { size: "S", chest: 42, length: 28.5, shoulder: 21.5, sleeve: 9.5 },
-                      { size: "M", chest: 44, length: 29, shoulder: 22, sleeve: 10 },
-                      { size: "L", chest: 44, length: 29.5, shoulder: 23, sleeve: 10.25 },
-                      { size: "XL", chest: 46, length: 30, shoulder: 24, sleeve: 10.5 },
+                      {
+                        size: "XS",
+                        chest: 40,
+                        length: 28,
+                        shoulder: 21,
+                        sleeve: 9,
+                      },
+                      {
+                        size: "S",
+                        chest: 42,
+                        length: 28.5,
+                        shoulder: 21.5,
+                        sleeve: 9.5,
+                      },
+                      {
+                        size: "M",
+                        chest: 44,
+                        length: 29,
+                        shoulder: 22,
+                        sleeve: 10,
+                      },
+                      {
+                        size: "L",
+                        chest: 44,
+                        length: 29.5,
+                        shoulder: 23,
+                        sleeve: 10.25,
+                      },
+                      {
+                        size: "XL",
+                        chest: 46,
+                        length: 30,
+                        shoulder: 24,
+                        sleeve: 10.5,
+                      },
                     ].map((row) => (
-                      <tr key={row.size} className="hover:bg-zinc-800 transition">
+                      <tr
+                        key={row.size}
+                        className="hover:bg-zinc-800 transition"
+                      >
                         <td className="px-4 py-2">{row.size}</td>
                         <td className="px-4 py-2">{row.chest}</td>
                         <td className="px-4 py-2">{row.length}</td>

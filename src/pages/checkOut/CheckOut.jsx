@@ -252,12 +252,61 @@ const CheckoutPage = () => {
       phone,
     } = orderDetails;
 
-    const html = `<div style="background:#0d0d0d;padding:30px;color:#fff;"><h2>Hello ${firstName},</h2><p>Your order <b>${order_id}</b> is confirmed.</p></div>`;
+   const html = `
+    <div style="background-color:#0d0d0d;padding:30px;font-family:sans-serif;color:#fff;">
+      <div style="max-width:600px;margin:auto;background-color:#1a1a1a;padding:30px;border-radius:8px;border:1px solid #333;">
+        <h2 style="color:#fff;margin-top:0;">Hi ${firstName} ${lastName},</h2>
+        <p style="color:#ccc;">
+          Thank you for shopping with <span style="color:orange;font-weight:bold;">Monstitch</span>! Your order has been placed successfully. Here are your order details:
+        </p>
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <p><strong>Order ID:</strong> ${order_id}</p>
+
+        <h3 style="margin-bottom:10px;">Items Ordered:</h3>
+
+        ${cartItems
+          .map(
+            (item) => `
+          <div style="display:flex;align-items:center;margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;">
+            <img src="${item.ImageUrl2}" alt="${item.name}" width="60" height="60" style="border-radius:4px;margin-right:15px;">
+            <div style="flex:1;">
+              <p style="margin:0;color:#fff;font-weight:600;">${item.name}</p>
+              <p style="margin:0;font-size:14px;color:#aaa;">Size: ${item.size}</p>
+              <p style="margin:0;font-size:14px;color:#aaa;">Qty: ${item.quantity}</p>
+            </div>
+            <div style="color:#fff;font-weight:500;">₹${item.price}</div>
+          </div>
+        `
+          )
+          .join("")}
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <p><strong>Total Amount:</strong> ₹${(amount).toFixed(2)}</p>
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <h3>Shipping Address:</h3>
+        <p style="color:#ccc;line-height:1.6;">
+          ${address}<br />
+          ${city}, ${state} - ${pin}<br />
+          <strong>Phone:</strong> ${phone}
+        </p>
+
+        <hr style="border:1px solid #333;margin:20px 0;">
+
+        <p style="color:#bbb;">Cheers,<br />
+        <span style="color:orange;font-weight:bold;">– Monstitch Team</span></p>
+      </div>
+    </div>
+  `;
     try {
       await fetch("/api/sendEmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: email, subject: "Order Confirmation", html }),
+        body: JSON.stringify({ to: email, subject: "Order Confirmation - MONSTITCH", html }),
       });
     } catch (error) {
       console.error("Email send failed:", error);

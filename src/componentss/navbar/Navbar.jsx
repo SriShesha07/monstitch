@@ -144,9 +144,9 @@ const Navbar = () => {
             <li>
               <Link to="/">Home</Link>
             </li>
-            <li>
+            {/* <li>
               <Link to="/allproduct">All Product</Link>
-            </li>
+            </li> */}
             {!user && (
               <li>
                 <Link to="/login">Sign In</Link>
