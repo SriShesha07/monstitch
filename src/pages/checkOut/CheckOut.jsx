@@ -166,6 +166,7 @@ const CheckoutPage = () => {
             totalPaid: amount,
             cartItems: cartItems.map((item) => ({
               name: item.name,
+              image: item.ImageUrl1,
               size: item.size,
               quantity: item.quantity,
               price: item.price,
