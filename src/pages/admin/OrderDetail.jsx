@@ -43,7 +43,7 @@ const OrderDetail = () => {
         .map(
           (item) => `
         <div style="display:flex;align-items:center;margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;">
-          <img src="${item.image}" alt="${item.name}" width="60" height="60" style="border-radius:4px;margin-right:15px;">
+          
           <div style="flex:1;">
             <p style="margin:0;color:#fff;font-weight:600;">${item.name}</p>
             <p style="margin:0;font-size:14px;color:#aaa;">Size: ${item.size}</p>
