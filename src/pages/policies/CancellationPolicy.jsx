@@ -12,7 +12,7 @@ export default function CancellationPolicy() {
             {/* ==== START EDITING BELOW THIS LINE ==== */}
             <section className="space-y-6 text-gray-300">
               <p>
-               Srinithy properties believes in helping its customers as far as possible, and has therefore a liberal cancellation policy. Under this policy: 
+               Srinithy properties (Monstitch) believes in helping its customers as far as possible, and has therefore a liberal cancellation policy. Under this policy: 
               </p>
                <ul className="list-disc list-inside space-y-1">
                 <li>
