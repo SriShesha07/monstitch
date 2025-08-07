@@ -57,7 +57,9 @@ const HomePageProductCard = () => {
                         {name?.substring(0, 30)}
                       </h3>
                       <p className="text-md font-semibold text-white mb-4">
-                        ₹{price}
+                        <span className="text-gray-400 line-through mr-2">₹885</span>
+                        {/* ₹{price} */}
+                         <span className="text-white">₹{price}</span>
                       </p>
                     </div>
 

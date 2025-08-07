@@ -129,7 +129,11 @@ const ProductInfo = () => {
           <div className="flex flex-col space-y-6 h-full">
             <div>
               <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-              <p className="text-gray-400 text-lg mb-4">Rs. {product.price}</p>
+              <p className="text-gray-400 text-lg mb-4">
+                <span className="text-gray-400 line-through mr-2">Rs. 885</span>
+    <span className="text-white">Rs. {product.price}</span>  
+                {/* Rs. {product.price} */}
+              </p>
 
               {/* Size Selector */}
               <div className="mb-4">
