@@ -16,8 +16,22 @@ const OrderDetail = () => {
   const closeModal = () => setSelectedOrder(null);
 
   const markAsShipped = async (order) => {
-    const { id, email, firstName, lastName, order_id, cartItems, totalPaid, address, city, state, pin, phone, apartment, image  } =
-      order;
+    const {
+      id,
+      email,
+      firstName,
+      lastName,
+      order_id,
+      cartItems,
+      totalPaid,
+      address,
+      city,
+      state,
+      pin,
+      phone,
+      apartment,
+      image,
+    } = order;
 
     try {
       setLoadingOrderId(id);
@@ -25,7 +39,7 @@ const OrderDetail = () => {
       const orderRef = doc(fireDB, "orders", id);
       await updateDoc(orderRef, { status: "Shipped" });
 
-     const emailHTML = `
+      const emailHTML = `
   <div style="background-color:#0d0d0d;padding:30px;font-family:sans-serif;color:#fff;">
     <div style="max-width:600px;margin:auto;background-color:#1a1a1a;padding:30px;border-radius:8px;border:1px solid #333;">
       <h2 style="color:#fff;margin-top:0;">Hi ${firstName} ${lastName},</h2>
@@ -57,7 +71,9 @@ const OrderDetail = () => {
 
       <hr style="border:1px solid #333;margin:20px 0;">
 
-      <p><strong>Total Amount:</strong> ₹${(totalPaid).toFixed(2)} (including ₹20 shipping)</p>
+      <p><strong>Total Amount:</strong> ₹${totalPaid.toFixed(
+        2
+      )} (including ₹20 shipping)</p>
 
       <hr style="border:1px solid #333;margin:20px 0;">
 
@@ -142,7 +158,12 @@ const OrderDetail = () => {
                   <td className="px-4 py-2 border">
                     {order.firstName} {order.lastName}
                   </td>
-                  <td className="px-4 py-2 border">{order.address}</td>
+                  {/* <td className="px-4 py-2 border">{order.address}, {order.apartment}, {order.city}, {order.state} - {order.pin}</td> */}
+                  <td className="px-4 py-2 border">
+                    {order.address}
+                    {order.apartment ? `, ${order.apartment}` : ""},{" "}
+                    {order.city}, {order.state} - {order.pin}
+                  </td>
                   <td className="px-4 py-2 border">{order.phone}</td>
                   <td className="px-4 py-2 border">{order.email}</td>
                   <td className="px-4 py-2 border">
