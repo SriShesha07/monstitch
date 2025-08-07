@@ -285,7 +285,7 @@ const CheckoutPage = () => {
 
         <hr style="border:1px solid #333;margin:20px 0;">
 
-        <p><strong>Total Amount:</strong> ₹${(amount).toFixed(2)}</p>
+        <p><strong>Total Amount:</strong> ₹${(amount).toFixed(2)} (including ₹20 shipping)</p>
 
         <hr style="border:1px solid #333;margin:20px 0;">
 
