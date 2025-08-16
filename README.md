@@ -6,6 +6,7 @@ This application provides customers with a seamless online shopping experience w
 🔑 Key Highlights
 
 ⚡ Built with React.js + Vite for fast performance
+
 💳 Integrated Razorpay Payment Gateway for secure transactions
 🔥 Firebase Database for real-time data management
 🌐 Deployed on Vercel for reliable and global hosting
