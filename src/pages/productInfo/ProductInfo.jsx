@@ -17,9 +17,13 @@ const ProductInfo = () => {
   const product = getAllProduct.find((p) => p.id === id);
   const allSizes = ["XS", "S", "M", "L", "XL"];
 
+  // Check if product has available sizes
+  const hasSizes = product?.sizes?.length > 0;
+
   const firstAvailableSize = useMemo(() => {
-    return allSizes.find((size) => product?.sizes?.includes(size)) || "XS";
-  }, [product]);
+    if (!hasSizes) return null;
+    return allSizes.find((size) => product?.sizes?.includes(size)) || null;
+  }, [product, hasSizes]);
 
   const [selectedSize, setSelectedSize] = useState(firstAvailableSize);
   const [quantity, setQuantity] = useState(1);
@@ -59,6 +63,12 @@ const ProductInfo = () => {
       navigate("/login");
       return;
     }
+
+    if (!hasSizes) {
+      toast.error("This item is out of stock.");
+      return;
+    }
+
     dispatch(addToCart({ ...product, size: selectedSize, quantity }));
     toast.success("Added to cart!");
   };
@@ -74,17 +84,6 @@ const ProductInfo = () => {
           {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* {[product.ImageUrl1, product.ImageUrl2].map((img, i) => (
-                <Zoom key={i}>
-                  <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
-                    <img
-                      src={img}
-                      alt={`Product ${i + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                  </div>
-                </Zoom>
-              ))} */}
               {product.Images?.map((img, i) => (
                 <Zoom key={i}>
                   <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
@@ -131,8 +130,7 @@ const ProductInfo = () => {
               <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
               <p className="text-gray-400 text-lg mb-4">
                 <span className="text-gray-400 line-through mr-2">Rs. 885</span>
-    <span className="text-white">Rs. {product.price}</span>  
-                {/* Rs. {product.price} */}
+                <span className="text-white">Rs. {product.price}</span>
               </p>
 
               {/* Size Selector */}
@@ -185,20 +183,27 @@ const ProductInfo = () => {
               {/* Add to Cart */}
               <button
                 onClick={handleAddToCart}
-                className="w-full py-3 border border-white rounded-full font-semibold hover:bg-white hover:text-black transition"
+                disabled={!hasSizes}
+                className={`w-full py-3 border rounded-full font-semibold transition ${
+                  hasSizes
+                    ? "border-white hover:bg-white hover:text-black"
+                    : "border-gray-600 text-gray-500 cursor-not-allowed"
+                }`}
               >
-                Add to Cart
+                {hasSizes ? "Add to Cart" : "Out of Stock"}
               </button>
 
               {/* View Size Chart */}
-              <div className="mt-4">
-                <button
-                  onClick={() => setShowSizeChart(true)}
-                  className="font-semibold text-white underline hover:text-gray-300 transition"
-                >
-                  View Size Chart
-                </button>
-              </div>
+              {hasSizes && (
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowSizeChart(true)}
+                    className="font-semibold text-white underline hover:text-gray-300 transition"
+                  >
+                    View Size Chart
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Product Description */}
