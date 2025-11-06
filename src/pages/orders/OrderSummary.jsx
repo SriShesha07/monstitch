@@ -38,7 +38,7 @@ const OrderSummary = () => {
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  const shipping = 20;
+  const shipping = 50;
   const total = subtotal + shipping;
 
   return (

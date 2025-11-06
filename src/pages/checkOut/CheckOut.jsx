@@ -94,7 +94,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    const amount = total + 20;
+    const amount = total + 50;
     const receipt = `rcptid_${Math.random().toString(36).substr(2, 9)}`;
 
     let order;
@@ -285,7 +285,7 @@ const CheckoutPage = () => {
 
         <hr style="border:1px solid #333;margin:20px 0;">
 
-        <p><strong>Total Amount:</strong> ₹${(amount).toFixed(2)} (including ₹20 shipping)</p>
+        <p><strong>Total Amount:</strong> ₹${(amount).toFixed(2)} (including ₹50 shipping)</p>
 
         <hr style="border:1px solid #333;margin:20px 0;">
 

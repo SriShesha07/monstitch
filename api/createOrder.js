@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
   try {
     let totalAmount = 0;
-    const shippingCharge = 20;
+    const shippingCharge = 50;
 
     for (const item of cartItems) {
       console.log(`🔍 Fetching product ID: ${item.productId}`);

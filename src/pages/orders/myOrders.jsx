@@ -95,7 +95,7 @@ const MyOrders = () => {
           </div>
         ) : (
           currentOrders.map((order) => {
-            const shippingCharge = 20;
+            const shippingCharge = 50;
             const subtotal = order.cartItems.reduce(
               (acc, item) => acc + item.price * item.quantity,
               0

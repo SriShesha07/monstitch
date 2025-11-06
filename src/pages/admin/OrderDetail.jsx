@@ -73,7 +73,7 @@ const OrderDetail = () => {
 
       <p><strong>Total Amount:</strong> ₹${totalPaid.toFixed(
         2
-      )} (including ₹20 shipping)</p>
+      )} (including ₹50 shipping)</p>
 
       <hr style="border:1px solid #333;margin:20px 0;">
 
