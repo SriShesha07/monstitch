@@ -1,6 +1,6 @@
 import React, { useRef, useState, useContext, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import myContext from "../../context/myContext";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/cartSlice";
@@ -28,12 +28,17 @@ const ProductInfo = () => {
   const [selectedSize, setSelectedSize] = useState(firstAvailableSize);
   const [quantity, setQuantity] = useState(1);
   const [showSizeChart, setShowSizeChart] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const modalRef = useRef(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
     setSelectedSize(firstAvailableSize);
   }, [firstAvailableSize]);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [id]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -51,7 +56,7 @@ const ProductInfo = () => {
 
   const relatedProducts = useMemo(() => {
     return getAllProduct
-      .filter((p) => p.id !== id)
+      .filter((p) => p.id !== id && p.isVisible === true)
       .sort(() => 0.5 - Math.random())
       .slice(0, 4);
   }, [getAllProduct, id]);
@@ -83,7 +88,88 @@ const ProductInfo = () => {
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mobile Carousel */}
+            <div className="md:hidden relative">
+              <div className="relative overflow-hidden rounded-xl border border-gray-700">
+                <div
+                  className="flex transition-transform duration-300 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentImageIndex * 100}%)`,
+                  }}
+                >
+                  {product.Images?.map((img, i) => (
+                    <div key={i} className="min-w-full aspect-[3/4]">
+                      <Zoom>
+                        <div className="w-full h-full relative group overflow-hidden">
+                          <img
+                            src={img}
+                            alt={`Product ${i + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </Zoom>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              {product.Images && product.Images.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === 0 ? product.Images.length - 1 : prev - 1
+                      )
+                    }
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition z-10"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === product.Images.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition z-10"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </>
+              )}
+
+              {/* Thumbnail Images */}
+              {product.Images && product.Images.length > 1 && (
+                <div className="mt-4 overflow-x-auto">
+                  <div className="flex gap-2 justify-center pb-2">
+                    {product.Images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
+                          currentImageIndex === i
+                            ? "border-white"
+                            : "border-gray-600 opacity-60 hover:opacity-100"
+                        }`}
+                        aria-label={`View image ${i + 1}`}
+                      >
+                        <img
+                          src={img}
+                          alt={`Thumbnail ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Grid */}
+            <div className="hidden md:grid grid-cols-2 gap-6">
               {product.Images?.map((img, i) => (
                 <Zoom key={i}>
                   <div className="aspect-[3/4] relative group overflow-hidden rounded-xl border border-gray-700">
@@ -97,30 +183,32 @@ const ProductInfo = () => {
               ))}
             </div>
 
-            {/* Related Products */}
-            <h2 className="text-xl font-semibold mt-4 text-white">
-              You May Also Like
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {relatedProducts.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => navigate(`/productinfo/${item.id}`)}
-                  className="bg-zinc-900 rounded-xl overflow-hidden border border-gray-700 cursor-pointer hover:scale-105 transition"
-                >
-                  <img
-                    src={item.ImageUrl2}
-                    alt={item.name}
-                    className="w-full h-52 object-cover"
-                  />
-                  <div className="p-3">
-                    <h3 className="text-white font-semibold text-sm truncate">
-                      {item.name}
-                    </h3>
-                    <p className="text-gray-400 text-sm">Rs. {item.price}</p>
+            {/* Related Products - Desktop Only */}
+            <div className="hidden md:block">
+              <h2 className="text-xl font-semibold mt-4 text-white">
+                You May Also Like
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {relatedProducts.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => navigate(`/productinfo/${item.id}`)}
+                    className="bg-zinc-900 rounded-xl overflow-hidden border border-gray-700 cursor-pointer hover:scale-105 transition"
+                  >
+                    <img
+                      src={item.ImageUrl2}
+                      alt={item.name}
+                      className="w-full h-52 object-cover"
+                    />
+                    <div className="p-3">
+                      <h3 className="text-white font-semibold text-sm truncate">
+                        {item.name}
+                      </h3>
+                      <p className="text-gray-400 text-sm">Rs. {item.price}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
@@ -244,6 +332,34 @@ const ProductInfo = () => {
                   <li>Use mild detergent</li>
                   <li>Turn T-shirt inside out to preserve color</li>
                 </ul>
+              </div>
+            </div>
+
+            {/* Related Products - Mobile Only (After Care Instructions) */}
+            <div className="md:hidden mt-8">
+              <h2 className="text-xl font-semibold mb-4 text-white">
+                You May Also Like
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                {relatedProducts.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => navigate(`/productinfo/${item.id}`)}
+                    className="bg-zinc-900 rounded-xl overflow-hidden border border-gray-700 cursor-pointer hover:scale-105 transition"
+                  >
+                    <img
+                      src={item.ImageUrl2}
+                      alt={item.name}
+                      className="w-full h-52 object-cover"
+                    />
+                    <div className="p-3">
+                      <h3 className="text-white font-semibold text-sm truncate">
+                        {item.name}
+                      </h3>
+                      <p className="text-gray-400 text-sm">Rs. {item.price}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

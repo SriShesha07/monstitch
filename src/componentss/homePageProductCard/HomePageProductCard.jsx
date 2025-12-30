@@ -28,8 +28,9 @@ const HomePageProductCard = () => {
 
       <section className="text-white">
         <div className="container px-4 mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[...getAllProduct]
+              .filter((item) => item.isVisible === true)
               .sort((a, b) => {
                 // Ensure numeric sorting even if productId is a string
                 return parseInt(a.productId) - parseInt(b.productId);
